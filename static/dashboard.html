@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to CLAW</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: linear-gradient(to bottom right, #e63131, #1d35d3);
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            font-family: "Montserrat", sans-serif;
+            margin: 0px;
+        }
+
+        .topBanner {
+            background-color: rgba(7, 27, 152, 0.55);
+            backdrop-filter: blur(5px);
+            width: calc(100vw - 30px);
+            position: relative;
+            top: 0px;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+            color: white;
+            box-shadow: rgba(0, 0, 0, 0.7) 0px 3px 20px;
+        }
+
+        .serviceTile {
+            background-color: rgba(7, 17, 62, 0.3);
+            width: 40vw;
+            height: 140px;
+            border-radius: 10px;
+            padding: 0px;
+            margin-left: 4.89vw;
+            margin-right: 4.89vw;
+            margin-top: 30px;
+            display: inline-flex;
+            text-align: center;
+            backdrop-filter: blur(100px);
+            transition: 0.2s;
+        }
+
+        .serviceTile:hover {
+            cursor: pointer;
+            background-color: rgba(7, 17, 62, 1);
+            box-shadow: 0px 0px 40px 2px rgba(91, 45, 255, 0.9);
+            transform: scale(102%);
+        }
+
+        .scrollContainer {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            overflow-x: clip;
+        }
+
+        .serviceTile_title {
+            width: 100%;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="scrollContainer">
+    <div id="topBanner" class="topBanner">
+        <h2>Welcome to CLAW!</h2>
+    </div>
+    <div class="serviceTile" id="solo_projects">
+        <h2 class="serviceTile_title">Projects (Solo)</h2>
+    </div>
+    <div class="serviceTile" id="team_projects">
+        <h2 class="serviceTile_title">Projects (Team)</h2>
+    </div>
+    <div class="serviceTile" id="checklist">
+        <h2 class="serviceTile_title">Checklist</h2>
+    </div>
+</div>
+</body>
+<script src="api/getclientapi"></script>
+<script>
+    CLAW_ClientAPI.init();
+    CLAW_ClientAPI.checkServiceAvailability(["solo_projects", "team_projects", "checklist"], true);
+</script>
+</html>
