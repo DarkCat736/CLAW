@@ -17,7 +17,7 @@
         }
 
         .topBanner {
-            background-color: rgba(7, 27, 152, 0.55);
+            background-color: rgb(55, 29, 119);
             backdrop-filter: blur(5px);
             width: calc(100vw - 30px);
             position: relative;
@@ -35,10 +35,11 @@
             width: 40vw;
             height: 140px;
             border-radius: 10px;
-            padding: 0px;
             margin-left: 4.89vw;
             margin-right: 4.89vw;
             margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
             display: inline-flex;
             text-align: center;
             backdrop-filter: blur(100px);
@@ -52,6 +53,10 @@
             transform: scale(102%);
         }
 
+        .serviceTile[available_service="false"] {
+            display: none;
+        }
+
         .scrollContainer {
             height: 100vh;
             width: 100vw;
@@ -59,9 +64,11 @@
             overflow-x: clip;
         }
 
-        .serviceTile_title {
+        .serviceTile_text {
             width: 100%;
             color: white;
+            position: relative;
+            padding: 15px;
         }
     </style>
 </head>
@@ -69,21 +76,37 @@
 <div class="scrollContainer">
     <div id="topBanner" class="topBanner">
         <h2>Welcome to CLAW!</h2>
+        <h2 style="position:absolute;right: 15px;top:0px;"><i>You are logged out.</i></h2>
     </div>
-    <div class="serviceTile" id="solo_projects">
-        <h2 class="serviceTile_title">Projects (Solo)</h2>
+    <div class="serviceTile" id="account" available_service="false">
+        <span class="serviceTile_text">
+            <h2>Account / API Login</h2>
+            <p>Manage your account and connect Canvas</p>
+        </span>
     </div>
-    <div class="serviceTile" id="team_projects">
-        <h2 class="serviceTile_title">Projects (Team)</h2>
+    <div class="serviceTile" id="checklist" available_service="false">
+        <span class="serviceTile_text">
+            <h2>Checklist</h2>
+            <p>Make a simple todo list with your tasks.</p>
+        </span>
     </div>
-    <div class="serviceTile" id="checklist">
-        <h2 class="serviceTile_title">Checklist</h2>
+    <div class="serviceTile" id="solo_projects" available_service="false">
+        <span class="serviceTile_text">
+            <h2>Projects (Solo)</h2>
+            <p>Keep track of large or complicated assignments.</p>
+        </span>
+    </div>
+    <div class="serviceTile" id="team_projects" available_service="false">
+        <span class="serviceTile_text">
+            <h2>Projects (Team)</h2>
+            <p>Work on projects collaboratively in one place.</p>
+        </span>
     </div>
 </div>
 </body>
 <script src="api/getclientapi"></script>
 <script>
     CLAW_ClientAPI.init();
-    CLAW_ClientAPI.checkServiceAvailability(["solo_projects", "team_projects", "checklist"], true);
+    CLAW_ClientAPI.checkServiceAvailability(["solo_projects", "team_projects", "checklist", "account"], true);
 </script>
 </html>

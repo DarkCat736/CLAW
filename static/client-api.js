@@ -1,6 +1,6 @@
 let CLAW_ClientAPI = {
     init: function() {
-        alert('client api is alive');
+        //
     },
     checkServiceAvailability: function(servicesToCheck, setElementActive) {
         servicesToCheck.forEach((service) => {
@@ -8,6 +8,7 @@ let CLAW_ClientAPI = {
             httpAPIRequest.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     if (httpAPIRequest.responseText == "true") {
+                        document.getElementById(service).setAttribute("available_service", "true");
                         console.log(`CLAW_ClientAPI: service "${service}" is marked as available.`);
                     } else {
                         if (setElementActive) {
