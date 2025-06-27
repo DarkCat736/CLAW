@@ -5,7 +5,8 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const {from} = require("buffer");
 const port = 9876;
-const mysql_rootpassword = ""; //INSERT ROOT PASSWORD!!
+const mysql_rootpassword = "claw_password"; //INSERT PASSWORD! THIS PROTECTS USER DATA SO IT SHOULD BE SECURE!
+const mysql_user = "claw_user"; //THIS MUST BE CHANGED TO ROOT UNLESS YOU CREATE THE "claw_user" ACCOUNT!
 let service_config = {
     checklist: {
         available: true
@@ -48,7 +49,7 @@ app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
     try {
         let db_connection = await mysql.createConnection({
             host: 'localhost',
-            user: 'root',
+            user: mysql_user,
             password: mysql_rootpassword,
             database: 'claw'
         });
@@ -63,7 +64,7 @@ app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
 
         db_connection = await mysql.createConnection({
             host: 'localhost',
-            user: 'root',
+            user: mysql_user,
             password: mysql_rootpassword,
             database: 'claw'
         });

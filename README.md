@@ -4,11 +4,12 @@ A platform for students to stay organized and work together
 <b>Setup:</b>
 
 1. Install MySQL server and run `CREATE DATABASE claw;` in the MySQL console
-2. run `CREATE TABLE accounts (email text, password text, name text, info text);` in the MySQL console
-3. Download the repository and run `npm install`
-4. Update line six of `index.js` to match your MySQL root account password 
-5. Start server with `node index.js`
-6. Go to `localhost:9876` and you're all set!
+2. Run `CREATE TABLE accounts (email text, password text, name text, info text);` in the MySQL console
+3. Create the "claw_user" account using `CREATE USER 'claw_user'@'localhost' IDENTIFIED BY 'claw_password';GRANT ALL PRIVILEGES ON claw.* TO 'claw_user'@'localhost';FLUSH PRIVILEGES;` <i>NOTE: You should change 'claw_password' to a more secure password. This is just an example.</i>
+4. Download the repository and run `npm install`
+5. Update line eight and nine of `index.js` to match your MySQL account username and password  
+6. Start server with `node index.js`
+7. Go to `localhost:9876` and you're all set!
 
 <b>INNER WORKINGS </b>(if I don't write this stuff down I'm guaranteed to forget it lol):
 
