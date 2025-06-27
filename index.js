@@ -36,6 +36,11 @@ app.get('/api/getclientapi', (req, res) => {
     res.sendFile(join(__dirname, 'static/client-api.js'));
 });
 
+//begin service routing
+app.get('/service/account', (req, res) => {
+    res.sendFile(join(__dirname, 'static/account_service.html'));
+});
+
 app.listen(port, () => {
     console.log(`CLAW server listening on port ${port}`);
 });

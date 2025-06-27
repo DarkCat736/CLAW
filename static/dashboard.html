@@ -76,27 +76,27 @@
 <div class="scrollContainer">
     <div id="topBanner" class="topBanner">
         <h2>Welcome to CLAW!</h2>
-        <h2 style="position:absolute;right: 15px;top:0px;"><i>You are logged out.</i></h2>
+        <h2 style="position:absolute;right: 15px;top:0px;" id="loginStatusText"><i>You are logged out.</i></h2>
     </div>
-    <div class="serviceTile" id="account" available_service="false">
+    <div class="serviceTile" id="account" available_service="false" onclick="window.open('service/account', '_self')">
         <span class="serviceTile_text">
             <h2>Account / API Login</h2>
             <p>Manage your account and connect Canvas</p>
         </span>
     </div>
-    <div class="serviceTile" id="checklist" available_service="false">
+    <div class="serviceTile" id="checklist" available_service="false" onclick="window.open('service/checklist', '_self')">
         <span class="serviceTile_text">
             <h2>Checklist</h2>
             <p>Make a simple todo list with your tasks.</p>
         </span>
     </div>
-    <div class="serviceTile" id="solo_projects" available_service="false">
+    <div class="serviceTile" id="solo_projects" available_service="false" onclick="window.open('service/solo_projects', '_self')">
         <span class="serviceTile_text">
             <h2>Projects (Solo)</h2>
             <p>Keep track of large or complicated assignments.</p>
         </span>
     </div>
-    <div class="serviceTile" id="team_projects" available_service="false">
+    <div class="serviceTile" id="team_projects" available_service="false" onclick="window.open('service/team_projects', '_self')">
         <span class="serviceTile_text">
             <h2>Projects (Team)</h2>
             <p>Work on projects collaboratively in one place.</p>
@@ -104,7 +104,7 @@
     </div>
 </div>
 </body>
-<script src="api/getclientapi"></script>
+<script src="/api/getclientapi"></script>
 <script>
     CLAW_ClientAPI.init();
     CLAW_ClientAPI.checkServiceAvailability(["solo_projects", "team_projects", "checklist", "account"], true);

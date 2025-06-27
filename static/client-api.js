@@ -1,6 +1,6 @@
 let CLAW_ClientAPI = {
     init: function() {
-        //
+        this.auth.init(true);
     },
     checkServiceAvailability: function(servicesToCheck, setElementActive) {
         servicesToCheck.forEach((service) => {
@@ -20,5 +20,62 @@ let CLAW_ClientAPI = {
             httpAPIRequest.open("GET", `api/service/${service}/availability`, true);
             httpAPIRequest.send();
         });
+    },
+    service: {
+        account: {
+            init: function() {
+                if (CLAW_ClientAPI.auth.loggedIn) {
+                    document.getElementById("accountInfoLoggedInStatusText").innerHTML = `${this.auth.email} (${this.auth.name})`;
+                    if (CLAW_ClientAPI.auth.canvasAPIAvailable) {
+                        document.getElementById("accountInfoCanvasAPIConnectionStatus").innerHTML = `Yes.`;
+                        document.getElementById("canvasAPIStatusText").innerHTML = `READY FOR REQUESTS`;
+                    } else {
+                        document.getElementById("accountInfoCanvasAPIConnectionStatus").innerHTML = `No. Add an API key using the Canvas API login option.`;
+                        document.getElementById("canvasAPIStatusText").innerHTML = `NO API KEY AVAILABLE`;
+                    }
+                } else {
+                    document.getElementById("accountInfoLoggedInStatusText").innerHTML = `LOGGED OUT`;
+                    document.getElementById("canvasAPIKeyInput").style.display = `none`;
+                    document.getElementById("canvasAPISubmitButton").style.display = `none`;
+                    document.getElementById("canvasAPIKeyInputHeader").style.display = `none`;
+                    document.getElementById("accountInfoCanvasAPIConnectionStatus").innerHTML = `A CLAW account is required for Canvas integration.`;
+                    document.getElementById("canvasAPIStatusText").innerHTML = `A CLAW account is required for Canvas integration.`;
+                }
+            },
+            tabController: {
+                selectedTab: "account_info",
+                selectTab: function(newSelectedTabID) {
+                    document.getElementById(this.selectedTab).setAttribute("selected", "false");
+                    document.getElementById(`${this.selectedTab}_view`).style.display = "none";
+                    this.selectedTab = newSelectedTabID;
+                    document.getElementById(newSelectedTabID).setAttribute("selected", "true");
+                    document.getElementById(`${newSelectedTabID}_view`).style.display = "block";
+                }
+            }
+        }
+    },
+    auth: {
+        init: function(changeLoggedInText) {
+            if (localStorage.getItem("email") != null && localStorage.getItem("password") != null && localStorage.getItem("canvasAPIAvailable") != null && localStorage.getItem("name") != null) {
+                this.email = localStorage.getItem("email");
+                this.password = localStorage.getItem("password");
+                this.name = localStorage.getItem("canvasAPIAvailable");
+                this.canvasAPIAvailable = Boolean(localStorage.getItem("canvasAPIAvailable"));
+                this.loggedIn = true;
+                if (changeLoggedInText) {
+                    document.getElementById("loginStatusText").innerHTML = `<i>${this.name}</i>`;
+                }
+            } else {
+                this.loggedIn = false;
+                if (changeLoggedInText) {
+                    document.getElementById("loginStatusText").innerHTML = `<i>You are logged out</i>`;
+                }
+            }
+        },
+        loggedIn: false,
+        name: null,
+        email: null,
+        password: null,
+        canvasAPIAvailable: false
     }
 }

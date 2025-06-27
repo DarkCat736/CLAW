@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to CLAW</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: linear-gradient(to bottom right, #e63131, #1d35d3);
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            font-family: "Montserrat", sans-serif;
+            margin: 0px;
+        }
+
+        .topBanner {
+            background-color: rgb(55, 29, 119);
+            backdrop-filter: blur(5px);
+            width: calc(100vw - 30px);
+            position: relative;
+            top: 0px;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+            color: white;
+            box-shadow: rgba(0, 0, 0, 0.7) 0px 3px 20px;
+        }
+
+        .sidebar {
+            background-color: rgba(7, 17, 62, 0.3);
+            width: 40vw;
+            border-radius: 10px;
+            margin-left: 5vw;
+            margin-right: 5vw;
+            margin-top: 30px;
+            padding-left: 10px;
+            display: inline-flex;
+            text-align: left;
+            backdrop-filter: blur(100px);
+            transition: 0.2s;
+        }
+
+        .scrollContainer {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            overflow-x: clip;
+        }
+
+        .menuOption {
+            width: calc(40vw - 30px);
+            color: white;
+            position: relative;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            transition: 0.2s;
+        }
+
+        .menuOption:hover {
+            cursor: pointer;
+            background-color: rgba(7, 17, 62, 1);
+            box-shadow: 0px 0px 15px 1px rgba(91, 45, 255, 0.9);
+            transform: scale(101%);
+        }
+
+        .menuOption[selected="true"] {
+            background-color: rgba(7, 17, 62, 1);
+        }
+
+        .viewer {
+            position: relative;
+            background-color: rgba(7, 17, 62, 0.3);
+            width: 40vw;
+            height: calc(100% - 155px);
+            right: 0px;
+            top: 0px;
+            border-radius: 10px;
+            margin-left: 0vw;
+            margin-top: 30px;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 20px;
+            display: inline-flex;
+            text-align: left;
+            backdrop-filter: blur(100px);
+            transition: 0.2s;
+            color: white;
+            overflow-y: scroll;
+        }
+
+        input {
+            border-radius: 5px;
+            border-width: 2px;
+            width: calc(100% - 15px);
+            border-color: black;
+            border-style: solid;
+            background-color: #1d2f8f;
+            outline: none;
+            color: white;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #c33142;
+        }
+
+        button {
+            border-radius: 5px;
+            border-width: 2px;
+            width: calc(100% - 7px);
+            border-color: black;
+            border-style: solid;
+            background-color: #1d2f8f;
+            outline: none;
+            color: white;
+            transition: 0.2s;
+            margin-top: 5px;
+            padding: 5px;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        button:hover {
+            background-color: #2b42c1;
+            cursor: pointer;
+        }
+
+        button:active {
+            background-color: #142fc5;
+        }
+    </style>
+</head>
+<body>
+<div class="scrollContainer">
+    <div id="topBanner" class="topBanner">
+        <h2>CLAW - Account / API Login</h2>
+        <h2 style="position:absolute;right: 15px;top:0px;" id="loginStatusText"><i>You are logged out.</i></h2>
+    </div>
+    <div class="sidebar">
+        <span>
+            <p class="menuOption" id="account_info" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('account_info')" selected="true">Account Information</p>
+            <p class="menuOption" id="canvasapi_loginoption" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('canvasapi_loginoption')">Canvas API Login</p>
+            <p class="menuOption" id="clawaccount_loginoption" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('clawaccount_loginoption')">CLAW Account Login</p>
+            <p class="menuOption" onclick="window.open('/', '_self')">Return to Dashboard</p>
+        </span>
+    </div>
+    <div class="viewer">
+        <div id="account_info_view" style="display: block;overflow-y: scroll;">
+            <p><b>Account Information</b></p>
+            <p><i>Currently logged in as: </i><span id="accountInfoLoggedInStatusText">LOGGED OUT</span></p>
+            <p><i>Canvas API connection: </i><span id="accountInfoCanvasAPIConnectionStatus">Yes.</span> API keys are encrypted and cannot be displayed.</p>
+        </div>
+        <div id="canvasapi_loginoption_view" style="display: none;overflow-y: scroll;">
+            <p><b>Canvas API Integration</b></p>
+            <p><i>Current status: </i><span id="canvasAPIStatusText">NO API KEY IN DATABASE</span></p>
+            <p><i><span id="canvasAPIKeyInputHeader">Add / Replace Canvas API key:</span></i></p>
+            <input type="password" id="canvasAPIKeyInput">
+            <button onclick="" id="canvasAPISubmitButton">Submit to database</button>
+        </div>
+        <div id="clawaccount_loginoption_view" style="display: none;overflow-y: scroll;">
+            <p><b>Account Information</b></p>
+            <p><i>Currently logged in as: </i>LOGGED OUT</p>
+            <p><i>Canvas API connection: </i>Yes. API keys are encrypted and cannot be displayed.</p>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/api/getclientapi"></script>
+<script>
+    CLAW_ClientAPI.init();
+    CLAW_ClientAPI.service.account.init();
+</script>
+</html>
