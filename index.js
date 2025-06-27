@@ -74,7 +74,7 @@ app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
             encryptedPassword = result;
         });
 
-        [rows, fields] = await db_connection.execute(`INSERT INTO accounts VALUES ('${req.params.email}', '${encryptedPassword}', '${req.params.name}', '{active: true}');`);
+        [rows, fields] = await db_connection.execute(`INSERT INTO accounts VALUES ('${req.params.email}', '${encryptedPassword}', '${req.params.name}', '{"active":"true","canvasAPIKey":"null"}');`);
         if (rows != null) {
             res.type("application/json");
             res.send({resType: "success", encryptedPassword: `${encryptedPassword}`});
@@ -92,43 +92,40 @@ app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
     }
 });
 
+app.get('/api/auth/signin/:email/:password', async (req, res) => {
+    try {
+        let db_connection = await mysql.createConnection({
+            host: 'localhost',
+            user: mysql_user,
+            password: mysql_rootpassword,
+            database: 'claw'
+        });
+        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+        if (rows[0] == null) {
+            res.type("application/json");
+            res.send({resType: "error", error: "There is no account associated with the provided email."});
+            return;
+        }
+
+        let didDecryptionSucceed;
+        await bcrypt.compare(req.params.password, rows[0].password).then(function(result) {
+            didDecryptionSucceed = result;
+        });
+
+        if (didDecryptionSucceed) {
+            res.type("application/json");
+            res.send({resType: "success", email: `${rows[0].email}`, encryptedPassword: `${rows[0].password}`, name: `${rows[0].name}`, info: `${rows[0].info}`});
+        } else {
+            res.type("application/json");
+            res.send({resType: "error", error: "The provided password is incorrect."});
+        }
+    } catch (e) {
+        console.log(e);
+        res.type("application/json");
+        res.send({resType: "error", error: "There was an error when processing your request. (internal server error)"});
+    }
+})
+
 app.listen(port, async () => {
     console.log(`CLAW server listening on port ${port}`);
 });
-
-async function encrypt(text) {
-    let encryptedText;
-    let didFail;
-    await bcrypt.hash(text, 10, function(err, hash) {
-        if (err) {
-            console.error('Error hashing password:', err);
-            didFail = true;
-            return;
-        }
-        console.log(hash);
-        encryptedText = hash;
-    });
-    if (didFail) {
-        return;
-    }
-    return encryptedText;
-}
-
-async function decrypt(encryptedText, key) {
-    let success;
-    await bcrypt.compare(key, encryptedText, async function(err, result) {
-        if (err) {
-            console.error('Error comparing password:', err);
-            success = false;
-            return;
-        }
-        if (result) {
-            console.log('Password matched!');
-            success = true;
-        } else {
-            console.log('Password did not match.');
-            success = false;
-        }
-    });
-    return success;
-}

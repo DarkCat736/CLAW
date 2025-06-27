@@ -151,6 +151,7 @@
             <p class="menuOption" id="account_info" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('account_info')" selected="true">Account Information</p>
             <p class="menuOption" id="canvasapi_loginoption" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('canvasapi_loginoption')">Canvas API Login</p>
             <p class="menuOption" id="clawaccount_loginoption" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('clawaccount_loginoption')">CLAW Account Login</p>
+            <p class="menuOption" onclick="CLAW_ClientAPI.auth.logOut()">Log Out</p>
             <p class="menuOption" onclick="window.open('/', '_self')">Return to Dashboard</p>
         </span>
     </div>
@@ -177,7 +178,7 @@
                 <p><i>Sign in:</i></p>
                 <input type="email" id="clawAccountSignInEmail" placeholder="Email">
                 <input type="password" id="clawAccountSignInPassword" placeholder="Password">
-                <button onclick="" id="clawAccountSignInButton">Sign in</button>
+                <button onclick="CLAW_ClientAPI.auth.signIn(document.getElementById('clawAccountSignInEmail').value, document.getElementById('clawAccountSignInPassword').value)" id="clawAccountSignInButton">Sign in</button>
                 <p><i>Sign up:</i></p>
                 <input type="email" id="clawAccountSignUpEmail" placeholder="Email">
                 <input type="password" id="clawAccountSignUpPassword" placeholder="Password">

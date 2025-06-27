@@ -82,7 +82,7 @@ let CLAW_ClientAPI = {
         signUp: function(email, password, name) {
             let httpAPIRequest = new XMLHttpRequest();
             httpAPIRequest.responseType = 'json';
-            httpAPIRequest.open('GET', `/api/auth/signup/${email}/${password}/${name}`); // Replace with your JSON resource URL
+            httpAPIRequest.open('GET', `/api/auth/signup/${email}/${password}/${name}`);
             httpAPIRequest.onload = function(e) {
                 if (this.status == 200) {
                     if (this.response["resType"] == "error") {
@@ -98,6 +98,38 @@ let CLAW_ClientAPI = {
                 }
             };
             httpAPIRequest.send();
+        },
+        signIn: function(email, password) {
+            let httpAPIRequest = new XMLHttpRequest();
+            httpAPIRequest.responseType = 'json';
+            httpAPIRequest.open('GET', `/api/auth/signin/${email}/${password}`);
+            httpAPIRequest.onload = function(e) {
+                if (this.status == 200) {
+                    if (this.response["resType"] == "error") {
+                        alert(`ERROR: ${this.response["error"]}`);
+                        location.reload();
+                    } else {
+                        localStorage.setItem("email", this.response["email"]);
+                        localStorage.setItem("password", this.response["encryptedPassword"]);
+                        localStorage.setItem("name", this.response["name"]);
+                        let additionalUserInfo = JSON.parse(this.response["info"]);
+                        if (additionalUserInfo.canvasAPIKey == "null") {
+                            localStorage.setItem("canvasAPIAvailable", "false");
+                        } else {
+                            localStorage.setItem("canvasAPIAvailable", "true");
+                        }
+                        location.reload();
+                    }
+                }
+            };
+            httpAPIRequest.send();
+        },
+        logOut: function () {
+            localStorage.removeItem("email");
+            localStorage.removeItem("password");
+            localStorage.removeItem("name");
+            localStorage.removeItem("canvasAPIAvailable");
+            location.reload();
         }
     }
 }
