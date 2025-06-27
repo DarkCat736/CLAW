@@ -106,6 +106,9 @@
             outline: none;
             color: white;
             transition: 0.2s;
+            font-family: "Montserrat", sans-serif;
+            padding: 5px;
+            margin-top: 5px;
         }
 
         input:focus {
@@ -115,7 +118,7 @@
         button {
             border-radius: 5px;
             border-width: 2px;
-            width: calc(100% - 7px);
+            width: 100%;
             border-color: black;
             border-style: solid;
             background-color: #1d2f8f;
@@ -161,13 +164,26 @@
             <p><b>Canvas API Integration</b></p>
             <p><i>Current status: </i><span id="canvasAPIStatusText">NO API KEY IN DATABASE</span></p>
             <p><i><span id="canvasAPIKeyInputHeader">Add / Replace Canvas API key:</span></i></p>
-            <input type="password" id="canvasAPIKeyInput">
+            <input type="password" id="canvasAPIKeyInput" placeholder="API Key">
             <button onclick="" id="canvasAPISubmitButton">Submit to database</button>
         </div>
         <div id="clawaccount_loginoption_view" style="display: none;overflow-y: scroll;">
-            <p><b>Account Information</b></p>
-            <p><i>Currently logged in as: </i>LOGGED OUT</p>
-            <p><i>Canvas API connection: </i>Yes. API keys are encrypted and cannot be displayed.</p>
+            <p><b>CLAW Account</b></p>
+            <span id="clawAccountSignedInChunk">
+                <p><i>Current status: </i> ACTIVE</p>
+                <p><i>Change password (click me)</i></p>
+            </span>
+            <span id="clawAccountLoggedOutChunk">
+                <p><i>Sign in:</i></p>
+                <input type="email" id="clawAccountSignInEmail" placeholder="Email">
+                <input type="password" id="clawAccountSignInPassword" placeholder="Password">
+                <button onclick="" id="clawAccountSignInButton">Sign in</button>
+                <p><i>Sign up:</i></p>
+                <input type="email" id="clawAccountSignUpEmail" placeholder="Email">
+                <input type="password" id="clawAccountSignUpPassword" placeholder="Password">
+                <input type="text" id="clawAccountSignUpName" placeholder="Full Name">
+                <button onclick="CLAW_ClientAPI.auth.signUp(document.getElementById('clawAccountSignUpEmail').value, document.getElementById('clawAccountSignUpPassword').value, document.getElementById('clawAccountSignUpName').value)" id="clawAccountSignUpButton">Sign up</button>
+            </span>
         </div>
     </div>
 </div>
