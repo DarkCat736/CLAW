@@ -26,6 +26,11 @@ app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'static/dashboard.html'));
 });
 
+app.get('/static/graphics/:fileName', (req, res) => {
+    res.type('image/png');
+    res.sendFile(join(__dirname, `static/graphics/${req.params.fileName}`));
+});
+
 app.get('/api/service/:serviceID/availability', (req, res) => {
     if (service_config[req.params.serviceID].available) {
         res.send("true");
@@ -41,7 +46,100 @@ app.get('/api/getclientapi', (req, res) => {
 
 //begin service routing
 app.get('/service/account', (req, res) => {
-    res.sendFile(join(__dirname, 'static/account_service.html'));
+    res.sendFile(join(__dirname, 'static/account.html'));
+});
+
+app.get('/service/checklist', (req, res) => {
+    res.sendFile(join(__dirname, 'static/checklist.html'));
+});
+
+app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) => {
+    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.password));
+    if (!authorized) {
+        res.type("application/json");
+        res.send({resType: "error", error: "Authorization error."});
+        return;
+    }
+    try {
+        let db_connection = await mysql.createConnection({
+            host: 'localhost',
+            user: mysql_user,
+            password: mysql_rootpassword,
+            database: 'claw'
+        });
+        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+        console.log(rows);
+        let userInfoObject = JSON.parse(rows[0]["info"]);
+        db_connection.end();
+        if (userInfoObject.checklist == null) {
+             userInfoObject.checklist = {
+                "0": {
+                    "title": "Untitled checklist",
+                    "content": {
+                        "0": {
+                            "content": "Add items now!",
+                            "completed": "false"
+                        }
+                    }
+                }
+            }
+            let db_connection = await mysql.createConnection({
+                host: 'localhost',
+                user: mysql_user,
+                password: mysql_rootpassword,
+                database: 'claw'
+            });
+            let [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
+            db_connection.end();
+            res.type("application/json");
+            res.send({resType: "success", data: `${JSON.stringify(userInfoObject.checklist)}`});
+        } else {
+            res.type("application/json");
+            res.send({resType: "success", data: `${JSON.stringify(userInfoObject.checklist)}`});
+        }
+    } catch (e) {
+        res.type("application/json");
+        res.send({resType: "error", error: "Internal server error while getting data."});
+        console.log(e);
+    }
+});
+
+app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, res) => {
+    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.password));
+    if (!authorized) {
+        res.type("application/json");
+        res.send({resType: "error", error: "Authorization error."});
+        return;
+    }
+    try {
+        let db_connection = await mysql.createConnection({
+            host: 'localhost',
+            user: mysql_user,
+            password: mysql_rootpassword,
+            database: 'claw'
+        });
+        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+        console.log(rows);
+        let userInfoObject = JSON.parse(rows[0]["info"]);
+        db_connection.end();
+
+        userInfoObject.checklist = JSON.parse(decodeURIComponent(req.params.data));
+
+        db_connection = await mysql.createConnection({
+            host: 'localhost',
+            user: mysql_user,
+            password: mysql_rootpassword,
+            database: 'claw'
+        });
+        [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
+        db_connection.end();
+        res.type("application/json");
+        res.send({resType: "success"});
+    } catch (e) {
+        res.type("application/json");
+        res.send({resType: "error", error: "Internal server error while pushing data."});
+        console.log(e);
+    }
 });
 
 //auth tasks
@@ -129,3 +227,26 @@ app.get('/api/auth/signin/:email/:password', async (req, res) => {
 app.listen(port, async () => {
     console.log(`CLAW server listening on port ${port}`);
 });
+
+async function signInForService(email, passwordHash) {
+    try {
+        let db_connection = await mysql.createConnection({
+            host: 'localhost',
+            user: mysql_user,
+            password: mysql_rootpassword,
+            database: 'claw'
+        });
+        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${email}';`);
+
+        let didDecryptionSucceed = (passwordHash === rows[0].password);
+
+        if (didDecryptionSucceed) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}

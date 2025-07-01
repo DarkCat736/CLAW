@@ -54,6 +54,112 @@ let CLAW_ClientAPI = {
                     document.getElementById(`${newSelectedTabID}_view`).style.display = "block";
                 }
             }
+        },
+        checklist: {
+            init: function () {
+                this.currentChecklistIndex = 0;
+                this.pullDBData(this.updateChecklistsList);
+            },
+            pullDBData: function(callback) {
+                let httpAPIRequest = new XMLHttpRequest();
+                httpAPIRequest.responseType = 'json';
+                httpAPIRequest.open('GET', `/api/service/checklist/pull_data/${CLAW_ClientAPI.auth.email}/${encodeURIComponent(CLAW_ClientAPI.auth.password)}`);
+                httpAPIRequest.onload = function(e) {
+                    if (this.status == 200) {
+                        if (this.response["resType"] == "error") {
+                            alert(`ERROR: ${this.response["error"]}`);
+                            window.open('/', '_self');
+                        } else {
+                            CLAW_ClientAPI.service.checklist.data = JSON.parse(this.response["data"]);
+                            if (callback != null) {
+                                callback();
+                            }
+                        }
+                    }
+                };
+                httpAPIRequest.send();
+            },
+            pushDBData: function(callback) {
+                let httpAPIRequest = new XMLHttpRequest();
+                httpAPIRequest.responseType = 'json';
+                httpAPIRequest.open('GET', `/api/service/checklist/push_data/${CLAW_ClientAPI.auth.email}/${encodeURIComponent(CLAW_ClientAPI.auth.password)}/${encodeURIComponent(JSON.stringify(this.data))}`);
+                httpAPIRequest.onload = function(e) {
+                    if (this.status == 200) {
+                        if (this.response["resType"] == "error") {
+                            alert(`ERROR: ${this.response["error"]}`);
+                            window.open('/', '_self');
+                        } else {
+                            if (callback != null) {
+                                callback();
+                            }
+                        }
+                    }
+                };
+                httpAPIRequest.send();
+            },
+            updateChecklistsList: async function() {
+                console.log(CLAW_ClientAPI.service.checklist.data);
+                document.getElementById("menuOptionsContainer").innerHTML = "";
+                for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data).length; i++) {
+                    console.log(`Checklist found: "${CLAW_ClientAPI.service.checklist.data[i].title}"`);
+                    document.getElementById("menuOptionsContainer").innerHTML += `<p class="checklistMenuOption" id="checklistOption_${i}" onclick="CLAW_ClientAPI.service.checklist.switchChecklists(${i})" selected="false">${CLAW_ClientAPI.service.checklist.data[i].title}</p>`;
+                }
+                document.getElementById("menuOptionsContainer").innerHTML += `<p class="checklistMenuOption" onclick="window.open('/', '_self')">Return to Dashboard</p>`;
+            },
+            updateChecklistItems: async function(checklistIndex) {
+                document.getElementById("editChecklistButton").innerHTML = "Edit Checklist";
+                document.getElementById("editChecklistButton").onclick = CLAW_ClientAPI.service.checklist.updateChecklistItemsEditMode;
+                document.getElementById("checklistViewerContainer").innerHTML = "";
+                for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[checklistIndex].content).length; i++) {
+                    console.log(`Checklist item found: "${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].content}"`);
+                    document.getElementById("checklistViewerContainer").innerHTML += `<span class="checklistItemContainer"><p class="checkListItemText" id="checkboxContainer_${i}" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}"><img id="checkboxButton_${i}" onclick="CLAW_ClientAPI.service.checklist.checkboxToggleFrom(${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}, ${i})" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}" class="checkButton" src="/static/graphics/check_icon.png"><span class="checklistItemTextContainer" id="checkboxText_${i}" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}">${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].content}</span></p></span>`;
+                }
+            },
+            updateChecklistItemsEditMode: async function() {
+                document.getElementById("editChecklistButton").innerHTML = "Save Checklist";
+                document.getElementById("editChecklistButton").onclick = CLAW_ClientAPI.service.checklist.saveFromEditMode;
+                document.getElementById("checklistViewerContainer").innerHTML = "";
+                document.getElementById("checklistTitleText").innerHTML = `<input type="text" id="checklistTitleEditBox" value="${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title}">`;
+                for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length; i++) {
+                    console.log(`Checklist item found: "${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}"`);
+                    document.getElementById("checklistViewerContainer").innerHTML += `<span><input type="text" id="checklistItemEditBox_${i}" value="${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}"><button class="checklistItemEditButton">&uarr;</button><button class="checklistItemEditButton">&darr;</button><button class="checklistItemEditButton">x</button></span>`;
+                }
+            },
+            saveFromEditMode: function() {
+                for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length; i++) {
+                    CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content = document.getElementById(`checklistItemEditBox_${i}`).value;
+                }
+                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title = document.getElementById("checklistTitleEditBox").value;
+                document.getElementById("checklistTitleText").innerHTML = CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title;
+                CLAW_ClientAPI.service.checklist.pushDBData();
+                CLAW_ClientAPI.service.checklist.updateChecklistsList();
+                CLAW_ClientAPI.service.checklist.switchChecklists(CLAW_ClientAPI.service.checklist.currentChecklistIndex);
+            },
+            switchChecklists: async function(newIndex) {
+                document.getElementById(`checklistOption_${this.currentChecklistIndex}`).setAttribute('selected', 'false');
+                document.getElementById(`checklistOption_${newIndex}`).setAttribute('selected', 'true');
+                document.getElementById("checklistTitleText").innerHTML = CLAW_ClientAPI.service.checklist.data[newIndex].title;
+                await this.pullDBData();
+                await this.updateChecklistItems(newIndex);
+            },
+            checkboxToggleFrom: async function(currentState, checkboxID) {
+                if (currentState == true || currentState == "true") {
+                    document.getElementById(`checkboxContainer_${checkboxID}`).setAttribute('checked', 'false');
+                    document.getElementById(`checkboxButton_${checkboxID}`).setAttribute('checked', 'false');
+                    document.getElementById(`checkboxText_${checkboxID}`).setAttribute('checked', 'false');
+                    CLAW_ClientAPI.service.checklist.data[this.currentChecklistIndex].content[checkboxID].completed = false;
+                }
+                if (currentState == false || currentState == "false") {
+                    document.getElementById(`checkboxContainer_${checkboxID}`).setAttribute('checked', 'true');
+                    document.getElementById(`checkboxButton_${checkboxID}`).setAttribute('checked', 'true');
+                    document.getElementById(`checkboxText_${checkboxID}`).setAttribute('checked', 'true');
+                    CLAW_ClientAPI.service.checklist.data[this.currentChecklistIndex].content[checkboxID].completed = true;
+                }
+                await this.updateChecklistItems(this.currentChecklistIndex);
+                await this.pushDBData();
+            },
+            currentChecklistIndex: null,
+            data: null
         }
     },
     auth: {

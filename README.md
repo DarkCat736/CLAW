@@ -45,3 +45,19 @@ CLAW_ClientAPI (root object)
    |_ canvasAPIAvailable (var)
    |_ signUp (function)
 ```
+
+<i>Checklist Service JSON Data Format</i>
+
+```json5
+{
+  "0": { //represents an entire checklist
+    "title": "Untitled checklist", //checklist title
+    "content": { //checklist items
+      "0": { //represents one checklist item
+        "content": "Add items now!", //item content
+        "completed": "false" //item completion status
+      }
+    }
+  }
+}
+```
