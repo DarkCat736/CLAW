@@ -70,7 +70,7 @@ app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) =>
         let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
         console.log(rows);
         let userInfoObject = JSON.parse(rows[0]["info"]);
-        db_connection.end();
+        db_connection.destroy();
         if (userInfoObject.checklist == null) {
              userInfoObject.checklist = {
                 "0": {
@@ -90,7 +90,7 @@ app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) =>
                 database: 'claw'
             });
             let [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
-            db_connection.end();
+            db_connection.destroy();
             res.type("application/json");
             res.send({resType: "success", data: `${JSON.stringify(userInfoObject.checklist)}`});
         } else {
@@ -121,9 +121,10 @@ app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, r
         let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
         console.log(rows);
         let userInfoObject = JSON.parse(rows[0]["info"]);
-        db_connection.end();
+        db_connection.destroy();
 
         userInfoObject.checklist = JSON.parse(decodeURIComponent(req.params.data));
+        console.log(JSON.stringify(userInfoObject).replaceAll('\\', '\\\\'));
 
         db_connection = await mysql.createConnection({
             host: 'localhost',
@@ -131,8 +132,8 @@ app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, r
             password: mysql_rootpassword,
             database: 'claw'
         });
-        [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
-        db_connection.end();
+        [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject).replaceAll('\\', '\\\\').replaceAll("'", "\\'")}' WHERE email = '${req.params.email}';`);
+        db_connection.destroy();
         res.type("application/json");
         res.send({resType: "success"});
     } catch (e) {
@@ -158,7 +159,7 @@ app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
             return;
         }
 
-        db_connection.end();
+        db_connection.destroy();
 
         db_connection = await mysql.createConnection({
             host: 'localhost',
@@ -177,13 +178,13 @@ app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
             res.type("application/json");
             res.send({resType: "success", encryptedPassword: `${encryptedPassword}`});
         }
-        db_connection.end();
+        db_connection.destroy();
     } catch (e) {
         console.error('Error executing query: ', e);
         res.type("application/json");
         res.send({resType: "error", error: "There was an error when processing your request. (internal server error)"});
         try {
-            db_connection.end();
+            db_connection.destroy();
         } catch (e) {
             console.log("DB connection close failure. (might be a harmless error): ", e);
         }
