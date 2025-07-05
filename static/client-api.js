@@ -1,6 +1,9 @@
 let CLAW_ClientAPI = {
     init: function() {
         this.auth.init(true);
+        if (window.location.host == "claw.kittentech.org") {
+            alert(`You are using a DEMO, WORK IN PROGRESS version of CLAW! (commit 5a115cd)\nPlease note that there will be bugs, which you should report at https://github.com/DarkCat736/CLAW/issues. Thank you!`);
+        }
     },
     checkServiceAvailability: function(servicesToCheck, setElementActive) {
         servicesToCheck.forEach((service) => {
@@ -69,7 +72,7 @@ let CLAW_ClientAPI = {
                         if (this.status == 200) {
                             if (this.response["resType"] == "error") {
                                 alert(`ERROR: ${this.response["error"]}`);
-                                //window.open('/', '_self');
+                                window.open('/', '_self');
                             } else {
                                 CLAW_ClientAPI.service.checklist.data = JSON.parse(this.response["data"]);
                                 if (callback != null) {
@@ -133,11 +136,21 @@ let CLAW_ClientAPI = {
                     resolve(true);
                 });
             },
+            addChecklistItem: async function() {
+                document.getElementById("addNewItemButton").disabled = true;
+                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length] = {content: "New item", completed: "false"};
+                let pushSuccess = await this.pushDBData();
+                document.getElementById("addNewItemButton").disabled = false;
+                await CLAW_ClientAPI.service.checklist.updateChecklistItemsEditMode();
+            },
+            deleteChecklistItem: async function() {
+                //
+            },
             updateChecklistItemsEditMode: async function() {
                 document.getElementById("editChecklistButton").innerHTML = "Save Checklist";
                 document.getElementById("editChecklistButton").onclick = CLAW_ClientAPI.service.checklist.saveFromEditMode;
                 document.getElementById("checklistViewerContainer").innerHTML = "";
-                document.getElementById("checklistTitleText").innerHTML = `<input type="text" id="checklistTitleEditBox" value="${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title}">`;
+                document.getElementById("checklistTitleText").innerHTML = `<input type="text" id="checklistTitleEditBox" value="${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title}"><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.addChecklistItem()" id="addNewItemButton">+</button>`;
                 for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length; i++) {
                     console.log(`Checklist item found: "${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}"`);
                     document.getElementById("checklistViewerContainer").innerHTML += `<span><input type="text" id="checklistItemEditBox_${i}" value="${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}"><button class="checklistItemEditButton">&uarr;</button><button class="checklistItemEditButton">&darr;</button><button class="checklistItemEditButton">x</button></span>`;
@@ -255,18 +268,6 @@ let CLAW_ClientAPI = {
             localStorage.removeItem("name");
             localStorage.removeItem("canvasAPIAvailable");
             location.reload();
-        }
-    },
-    utilities: {
-        removeEscapeCharacters: function(inputText) {
-            let editedText = inputText.replaceAll("'","\\'");
-            editedText = editedText.replaceAll(`"`,`\\"`);
-            return editedText;
-        },
-        reAddEscapeCharacters: function(inputText) {
-            let editedText = inputText.replaceAll("\\'", "'");
-            editedText = editedText.replaceAll(`\\"`, `"`);
-            return editedText;
         }
     }
 }

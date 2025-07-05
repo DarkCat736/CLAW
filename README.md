@@ -1,10 +1,10 @@
 # CLAW
-A platform for students to stay organized and work together
+A platform for students to stay organized and work together, with a large focus on streamlining group projects. Your data is stored in a server-side database, meaning you can access it anywhere!
 
 <b>Setup:</b>
 
 1. Install MySQL server and run `CREATE DATABASE claw;` in the MySQL console
-2. Run `CREATE TABLE accounts (email text, password text, name text, info text);SET GLOBAL wait_timeout = 10;` in the MySQL console
+2. Run `CREATE TABLE accounts (email text, password text, name text, info text);SET GLOBAL wait_timeout = 2;` in the MySQL console
 3. Create the "claw_user" account using `CREATE USER 'claw_user'@'localhost' IDENTIFIED BY 'claw_password';GRANT ALL PRIVILEGES ON claw.* TO 'claw_user'@'localhost';FLUSH PRIVILEGES;` <i>NOTE: You should change 'claw_password' to a more secure password. This is just an example.</i>
 4. Download the repository and run `npm install`
 5. Update line eight and nine of `index.js` to match your MySQL account username and password  
@@ -36,6 +36,19 @@ CLAW_ClientAPI (root object)
       |_ tabController
          |_ selectedTab (var)
          |_ selectTab (function)
+   |_ checklist
+      |_ init (function)
+      |_ pushDBData (function)
+      |_ pullDBData (function)
+      |_ updateChecklistsList (function)
+      |_ createNewChecklist(function)
+      |_ updateChecklistItems (function)
+      |_ updateChecklistItemsEditMode (function)
+      |_ saveFromEditMode (function)
+      |_ switchChecklists (function)
+      |_ checkboxToggleFrom (function)
+      |_ currentChecklistIndex (var)
+      |_ data (var)
 |_ auth
    |_ init (function)
    |_ loggedIn (var)
@@ -44,6 +57,7 @@ CLAW_ClientAPI (root object)
    |_ password (var)
    |_ canvasAPIAvailable (var)
    |_ signUp (function)
+   |_ logOut (function)
 ```
 
 <i>Checklist Service JSON Data Format</i>
