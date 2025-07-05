@@ -189,10 +189,10 @@ let CLAW_ClientAPI = {
                 document.getElementById("editChecklistButton").innerHTML = "Save Checklist";
                 document.getElementById("editChecklistButton").onclick = CLAW_ClientAPI.service.checklist.saveFromEditMode;
                 document.getElementById("checklistViewerContainer").innerHTML = "";
-                document.getElementById("checklistTitleText").innerHTML = `<input type="text" id="checklistTitleEditBox" value="${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title}"><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.addChecklistItem()" id="addNewItemButton">+</button>`;
+                document.getElementById("checklistTitleText").innerHTML = `<input type="text" id="checklistTitleEditBox" value='${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title.replaceAll('"', '\\"')}'><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.addChecklistItem()" id="addNewItemButton">+</button>`;
                 for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length; i++) {
                     console.log(`Checklist item found: "${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}"`);
-                    document.getElementById("checklistViewerContainer").innerHTML += `<span><input type="text" id="checklistItemEditBox_${i}" value="${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}"><button class="checklistItemEditButton">&uarr;</button><button class="checklistItemEditButton">&darr;</button><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.deleteChecklistItem(${i})">x</button></span>`;
+                    document.getElementById("checklistViewerContainer").innerHTML += `<span><input type="text" id="checklistItemEditBox_${i}" value='${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}'><button class="checklistItemEditButton">&uarr;</button><button class="checklistItemEditButton">&darr;</button><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.deleteChecklistItem(${i})">x</button></span>`;
                 }
             },
             saveFromEditMode: async function() {
