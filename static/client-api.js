@@ -1,8 +1,8 @@
 let CLAW_ClientAPI = {
     init: function() {
         this.auth.init(true);
-        if (window.location.host == "claw.kittentech.org") {
-            alert(`You are using a DEMO, WORK IN PROGRESS version of CLAW! (commit 5a115cd)\nPlease note that there will be bugs, which you should report at https://github.com/DarkCat736/CLAW/issues. Thank you!`);
+        if (window.location == "https://claw.kittentech.org/") {
+            alert(`You are using a DEMO, WORK IN PROGRESS version of CLAW! (commit 3dc3212)\nPlease note that there will be bugs, which you should report at https://github.com/DarkCat736/CLAW/issues. Thank you!`);
         }
     },
     checkServiceAvailability: function(servicesToCheck, setElementActive) {
