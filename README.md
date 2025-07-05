@@ -1,6 +1,8 @@
 # CLAW
 A platform for students to stay organized and work together
 
+<i>Demo of an old commit: https://claw.kittentech.org</i>
+
 <b>Setup:</b>
 
 1. Install MySQL server and run `CREATE DATABASE claw;` in the MySQL console
