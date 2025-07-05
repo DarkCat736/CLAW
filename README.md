@@ -38,6 +38,19 @@ CLAW_ClientAPI (root object)
       |_ tabController
          |_ selectedTab (var)
          |_ selectTab (function)
+   |_ checklist
+      |_ init (function)
+      |_ pushDBData (function)
+      |_ pullDBData (function)
+      |_ updateChecklistsList (function)
+      |_ createNewChecklist(function)
+      |_ updateChecklistItems (function)
+      |_ updateChecklistItemsEditMode (function)
+      |_ saveFromEditMode (function)
+      |_ switchChecklists (function)
+      |_ checkboxToggleFrom (function)
+      |_ currentChecklistIndex (var)
+      |_ data (var)
 |_ auth
    |_ init (function)
    |_ loggedIn (var)
@@ -46,6 +59,7 @@ CLAW_ClientAPI (root object)
    |_ password (var)
    |_ canvasAPIAvailable (var)
    |_ signUp (function)
+   |_ logOut (function)
 ```
 
 <i>Checklist Service JSON Data Format</i>
