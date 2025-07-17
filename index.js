@@ -1,16 +1,22 @@
 const express = require('express');
-const {join} = require("node:path");
-const app = express();
+const { createServer } = require('node:http');
+const { join } = require('node:path');
+const { Server } = require('socket.io');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const {from} = require("buffer");
-const { Server } = require("socket.io");
-const { createServer } = require('node:http');
-const server = createServer(app);
-const io = new Server(server);
 const port = 9876;
 const mysql_rootpassword = "claw_password"; //INSERT PASSWORD! THIS PROTECTS USER DATA SO IT SHOULD BE SECURE!
 const mysql_user = "claw_user"; //THIS MUST BE CHANGED TO ROOT UNLESS YOU CREATE THE "claw_user" ACCOUNT!
+
+//server initialization
+const app = express();
+const server = createServer(app);
+server.listen(port, async () => {
+    console.log(`CLAW server listening on port ${port}`);
+});
+const io = new Server(server);
+
 let service_config = {
     checklist: {
         available: true
@@ -55,6 +61,10 @@ app.get('/service/account', (req, res) => {
 
 app.get('/service/checklist', (req, res) => {
     res.sendFile(join(__dirname, 'static/checklist.html'));
+});
+
+app.get('/service/teamprojects', (req, res) => {
+    res.sendFile(join(__dirname, 'static/team_projects_dashboard.html'));
 });
 
 app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) => {
@@ -147,6 +157,49 @@ app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, r
     }
 });
 
+app.get('/api/service/team_projects/get_added_projects/:email/:password', async (req, res) => {
+    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.password));
+    if (!authorized) {
+        res.type("application/json");
+        res.send({resType: "error", error: "Authorization error."});
+        return;
+    }
+    try {
+        let db_connection = await mysql.createConnection({
+            host: 'localhost',
+            user: mysql_user,
+            password: mysql_rootpassword,
+            database: 'claw'
+        });
+        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+        console.log(rows);
+        let userInfoObject = JSON.parse(rows[0]["info"]);
+        db_connection.destroy();
+        if (userInfoObject.team_projects == null) {
+            userInfoObject.team_projects = {
+                "0": {id: "0", name: "Sample Project"}
+            };
+            let db_connection = await mysql.createConnection({
+                host: 'localhost',
+                user: mysql_user,
+                password: mysql_rootpassword,
+                database: 'claw'
+            });
+            let [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
+            db_connection.destroy();
+            res.type("application/json");
+            res.send({resType: "success", data: `${JSON.stringify(userInfoObject.team_projects)}`});
+        } else {
+            res.type("application/json");
+            res.send({resType: "success", data: `${JSON.stringify(userInfoObject.team_projects)}`});
+        }
+    } catch (e) {
+        res.type("application/json");
+        res.send({resType: "error", error: "Internal server error while getting data."});
+        console.log(e);
+    }
+});
+
 //auth tasks
 app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
     try {
@@ -227,11 +280,65 @@ app.get('/api/auth/signin/:email/:password', async (req, res) => {
         res.type("application/json");
         res.send({resType: "error", error: "There was an error when processing your request. (internal server error)"});
     }
-})
-
-app.listen(port, async () => {
-    console.log(`CLAW server listening on port ${port}`);
 });
+
+app.get('/api/auth/authorize_creds/:email/:encryptedPassword', async (req, res) => {
+    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.encryptedPassword));
+    if (!authorized) {
+        res.type("application/json");
+        res.send({result: "false"});
+    } else {
+        res.type("application/json");
+        res.send({result: "true"});
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log(`Collaboration client "${socket.id}" joined. Awaiting initialization call.`);
+    socket.on('disconnect', () => {
+        console.log(`Collaboration client "${socket.id}" disconnected.`);
+    });
+    socket.on('init', async (payload) => {
+        console.log(payload);
+        if (payload.serviceForInit == "team_projects") {
+            if (await CLAW_ServerAPI.team_projects.checkAuthForProject(payload.teamProjectID, payload.email, payload.hashedPassword)) {console.log(`auth failure on team_project init for socket "${socket.id}"`);return false;}
+            socket.join(`team_project_${payload.teamProjectID}`);
+            console.log(`Collaboration client "${socket.id}" assigned to room "team_project_${payload.teamProjectID}" after initialization and authorization.`);
+            io.to(`team_project_${payload.teamProjectID}`).emit('update',{type: "new_user", email: payload.email});
+        }
+    });
+});
+
+let CLAW_ServerAPI = {
+    collaborationUsers: {
+        teamProjectsActiveUsers: []
+    },
+    team_projects: {
+        checkAuthForProject: async function(projectID, email, passwordHash) {
+            if (!await signInForService(email, passwordHash)) {return false;}
+            try {
+                let db_connection = await mysql.createConnection({
+                    host: 'localhost',
+                    user: mysql_user,
+                    password: mysql_rootpassword,
+                    database: 'claw'
+                });
+                let [rows, fields] = await db_connection.execute(`SELECT * FROM team_projects WHERE id = ${projectID};`);
+
+                let isAuthorized = JSON.parse(rows[0].authorizedUsers).includes(email);
+
+                if (isAuthorized) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
+        }
+    }
+};
 
 async function signInForService(email, passwordHash) {
     try {
@@ -243,13 +350,7 @@ async function signInForService(email, passwordHash) {
         });
         let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${email}';`);
 
-        let didDecryptionSucceed = (passwordHash === rows[0].password);
-
-        if (didDecryptionSucceed) {
-            return true;
-        } else {
-            return false;
-        }
+        return (passwordHash === rows[0].password);
     } catch (e) {
         console.log(e);
         return false;

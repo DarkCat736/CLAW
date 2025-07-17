@@ -1,6 +1,6 @@
 let CLAW_ClientAPI = {
-    init: function() {
-        this.auth.init(true);
+    init: async function() {
+        await this.auth.init(true);
         if (window.location == "https://claw.kittentech.org/") {
             alert(`You are using a DEMO, WORK IN PROGRESS version of CLAW! (commit 3dc3212)\nPlease note that there will be bugs, which you should report at https://github.com/DarkCat736/CLAW/issues. Thank you!`);
         }
@@ -26,7 +26,8 @@ let CLAW_ClientAPI = {
     },
     service: {
         account: {
-            init: function() {
+            init: async function() {
+                let auth = await CLAW_ClientAPI.auth.init(true);
                 if (CLAW_ClientAPI.auth.loggedIn) {
                     document.getElementById("accountInfoLoggedInStatusText").innerHTML = `${CLAW_ClientAPI.auth.email} (${CLAW_ClientAPI.auth.name})`;
                     document.getElementById("clawAccountLoggedOutChunk").style.display = `none`;
@@ -60,7 +61,7 @@ let CLAW_ClientAPI = {
         },
         checklist: {
             init: async function () {
-                //this.currentChecklistIndex = null;
+                await CLAW_ClientAPI.auth.init(true);
                 await this.pullDBData(this.updateChecklistsList);
             },
             pullDBData: function(callback) {
@@ -232,11 +233,88 @@ let CLAW_ClientAPI = {
             },
             currentChecklistIndex: null,
             data: null
+        },
+        team_projects: {
+            dashboard: {
+                init: async function() {
+                    let auth = await CLAW_ClientAPI.auth.init(true);
+                    await this.updateProjectList();
+                },
+                updateProjectList: async function() {
+                    await CLAW_ClientAPI.service.team_projects.user.getAddedProjects();
+                    document.getElementById("menuOptionsContainer").innerHTML = ``;
+                    document.getElementById("menuOptionsContainer").innerHTML += `<p class="staticMenuOption"><b>Available projects:</b></p>`;
+                    for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.team_projects.user.addedProjects).length; i++) {
+                        document.getElementById("menuOptionsContainer").innerHTML += `<p class="menuOption" id="projectMenuOption_${i}" onclick="" selected="false">${CLAW_ClientAPI.service.team_projects.user.addedProjects[i].name}</p>`;
+                    }
+                    document.getElementById("menuOptionsContainer").innerHTML += `<p class="menuOption" onclick="window.open('/', '_self')"><i>Return to Dashboard</i></p>`;
+                }
+            },
+            user: {
+                getAddedProjects: async function() {
+                    return new Promise((resolve, reject) => {
+                        let httpAPIRequest = new XMLHttpRequest();
+                        httpAPIRequest.responseType = 'json';
+                        httpAPIRequest.open('GET', `/api/service/team_projects/get_added_projects/${CLAW_ClientAPI.auth.email}/${encodeURIComponent(CLAW_ClientAPI.auth.password)}`);
+                        httpAPIRequest.onload = function (e) {
+                            if (this.status == 200) {
+                                if (this.response["resType"] == "error") {
+                                    alert(`ERROR: ${this.response["error"]}`);
+                                    window.open('/', '_self');
+                                } else {
+                                    CLAW_ClientAPI.service.team_projects.user.addedProjects = JSON.parse(this.response["data"]);
+                                    resolve(true);
+                                }
+                            }
+                        };
+                        httpAPIRequest.send();
+                    });
+                },
+                addedProjects: null
+            },
+            collaboration: {
+                currentProjectID: null,
+                activeUserList: [],
+                joinProject: function(projectID) {
+                    this.socket.emit('init', {serviceForInit: "team_projects", email: `${CLAW_ClientAPI.auth.email}`, hashedPassword: `${CLAW_ClientAPI.auth.password}`, teamProjectID: projectID});
+                },
+                socket: null,
+                init: async function() {
+                    let auth = await CLAW_ClientAPI.auth.init(false);
+                    this.socket = io();
+                    this.joinProject(0);
+                    this.socket.on('update', (payload) => {
+                        switch (payload.type) {
+                            case "new_user":
+                                console.log(`user with ID "${payload.email}" has joined the project.`);
+                                this.activeUserList.push(payload.email);
+                                break;
+                            default:
+                                console.log("parsing error for server collaboration communication.");
+                        }
+                        console.log(payload);
+                    });
+                },
+            },
+            projects: {
+                getProjectOverview: async function () {
+
+                }
+            }
         }
     },
     auth: {
-        init: function(changeLoggedInText) {
+        init: async function (changeLoggedInText) {
             if (localStorage.getItem("email") != null && localStorage.getItem("password") != null && localStorage.getItem("canvasAPIAvailable") != null && localStorage.getItem("name") != null) {
+                console.log(await CLAW_ClientAPI.auth.authorizeCredentials(localStorage.getItem("email"), localStorage.getItem("password")));
+                if (!await CLAW_ClientAPI.auth.authorizeCredentials(localStorage.getItem("email"), localStorage.getItem("password"))) {
+                    this.loggedIn = false;
+                    if (changeLoggedInText) {
+                        document.getElementById("loginStatusText").innerHTML = `<i>You are logged out</i>`;
+                    }
+                    alert(`WARNING: You have credentials saved locally that do not match an account in the database. Try logging in again and if the problem persists, contact support.`);
+                    return false;
+                }
                 this.email = localStorage.getItem("email");
                 this.password = localStorage.getItem("password");
                 this.name = localStorage.getItem("name");
@@ -258,6 +336,10 @@ let CLAW_ClientAPI = {
         password: null,
         canvasAPIAvailable: false,
         signUp: function(email, password, name) {
+            if (this.loggedIn == true) {
+                console.log(`You have tried to make another account while already logged in! Directly sending requests to the CLAW API is prohibited usage.`);
+                return;
+            }
             let httpAPIRequest = new XMLHttpRequest();
             httpAPIRequest.responseType = 'json';
             httpAPIRequest.open('GET', `/api/auth/signup/${email}/${password}/${name}`);
@@ -278,6 +360,10 @@ let CLAW_ClientAPI = {
             httpAPIRequest.send();
         },
         signIn: function(email, password) {
+            if (this.loggedIn == true) {
+                console.log(`You have tried to sign in while already logged in to an account! Directly sending requests to the CLAW API is prohibited usage.`);
+                return;
+            }
             let httpAPIRequest = new XMLHttpRequest();
             httpAPIRequest.responseType = 'json';
             httpAPIRequest.open('GET', `/api/auth/signin/${email}/${password}`);
@@ -301,6 +387,23 @@ let CLAW_ClientAPI = {
                 }
             };
             httpAPIRequest.send();
+        },
+        authorizeCredentials: function(email, encryptedPassword) {
+            return new Promise((resolve, reject) => {
+                let httpAPIRequest = new XMLHttpRequest();
+                httpAPIRequest.responseType = 'json';
+                httpAPIRequest.open('GET', `/api/auth/authorize_creds/${email}/${encodeURIComponent(encryptedPassword)}`);
+                httpAPIRequest.onload = function(e) {
+                    if (this.status == 200) {
+                        if (this.response["result"] == "false") {
+                            resolve(false);
+                        } else {
+                            resolve(true);
+                        }
+                    }
+                };
+                httpAPIRequest.send();
+            });
         },
         logOut: function () {
             localStorage.removeItem("email");

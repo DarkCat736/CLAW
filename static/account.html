@@ -151,6 +151,7 @@
             <p class="menuOption" id="account_info" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('account_info')" selected="true">Account Information</p>
             <p class="menuOption" id="canvasapi_loginoption" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('canvasapi_loginoption')">Canvas API Login</p>
             <p class="menuOption" id="clawaccount_loginoption" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('clawaccount_loginoption')">CLAW Account Login</p>
+            <p class="menuOption" id="about" onclick="CLAW_ClientAPI.service.account.tabController.selectTab('about')">About CLAW</p>
             <p class="menuOption" onclick="CLAW_ClientAPI.auth.logOut()">Log Out</p>
             <p class="menuOption" onclick="window.open('/', '_self')">Return to Dashboard</p>
         </span>
@@ -186,12 +187,17 @@
                 <button onclick="CLAW_ClientAPI.auth.signUp(document.getElementById('clawAccountSignUpEmail').value, document.getElementById('clawAccountSignUpPassword').value, document.getElementById('clawAccountSignUpName').value)" id="clawAccountSignUpButton">Sign up</button>
             </span>
         </div>
+        <div id="about_view" style="display: none;overflow-y: scroll;">
+            <p><b>All About CLAW</b></p>
+            <p>CLAW is a platform for allowing students to collaborate and stay organized. In order to do this in the best way possible, your account data is stored in the cloud instead of on-device, meaning your organization tools are available from anywhere you can access the internet! In addition to cloud data storage, we also utilize APIs such as Socket.io to provide seamless, realtime collaboration experiences.</p>
+            <p>Please remember that we take student safety very seriously, and if abuse reports are made we always investigate.</p>
+            <p>Thank you and have a great time using CLAW!</p>
+        </div>
     </div>
 </div>
 </body>
 <script src="/api/getclientapi"></script>
 <script>
-    CLAW_ClientAPI.init();
     CLAW_ClientAPI.service.account.init();
 </script>
 </html>
