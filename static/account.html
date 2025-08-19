@@ -16,6 +16,10 @@
             margin: 0px;
         }
 
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
         .topBanner {
             background-color: rgb(55, 29, 119);
             backdrop-filter: blur(5px);
@@ -49,6 +53,10 @@
             width: 100vw;
             overflow-y: scroll;
             overflow-x: clip;
+        }
+
+        .scrollContainer::-webkit-scrollbar {
+            display: none;
         }
 
         .menuOption {
@@ -94,6 +102,10 @@
             transition: 0.2s;
             color: white;
             overflow-y: scroll;
+        }
+
+        .viewer::-webkit-scrollbar {
+            display: none;
         }
 
         input {
@@ -157,19 +169,19 @@
         </span>
     </div>
     <div class="viewer">
-        <div id="account_info_view" style="display: block;overflow-y: scroll;">
+        <div id="account_info_view" style="display: block;">
             <p><b>Account Information</b></p>
             <p><i>Currently logged in as: </i><span id="accountInfoLoggedInStatusText">LOGGED OUT</span></p>
             <p><i>Canvas API connection: </i><span id="accountInfoCanvasAPIConnectionStatus">Yes.</span> API keys are encrypted and cannot be displayed.</p>
         </div>
-        <div id="canvasapi_loginoption_view" style="display: none;overflow-y: scroll;">
+        <div id="canvasapi_loginoption_view" style="display: none;">
             <p><b>Canvas API Integration</b></p>
             <p><i>Current status: </i><span id="canvasAPIStatusText">NO API KEY IN DATABASE</span></p>
             <p><i><span id="canvasAPIKeyInputHeader">Add / Replace Canvas API key:</span></i></p>
             <input type="password" id="canvasAPIKeyInput" placeholder="API Key">
             <button onclick="" id="canvasAPISubmitButton">Submit to database</button>
         </div>
-        <div id="clawaccount_loginoption_view" style="display: none;overflow-y: scroll;">
+        <div id="clawaccount_loginoption_view" style="display: none;">
             <p><b>CLAW Account</b></p>
             <span id="clawAccountSignedInChunk">
                 <p><i>Current status: </i> ACTIVE</p>
@@ -187,7 +199,7 @@
                 <button onclick="CLAW_ClientAPI.auth.signUp(document.getElementById('clawAccountSignUpEmail').value, document.getElementById('clawAccountSignUpPassword').value, document.getElementById('clawAccountSignUpName').value)" id="clawAccountSignUpButton">Sign up</button>
             </span>
         </div>
-        <div id="about_view" style="display: none;overflow-y: scroll;">
+        <div id="about_view" style="display: none;">
             <p><b>All About CLAW</b></p>
             <p>CLAW is a platform for allowing students to collaborate and stay organized. In order to do this in the best way possible, your account data is stored in the cloud instead of on-device, meaning your organization tools are available from anywhere you can access the internet! In addition to cloud data storage, we also utilize APIs such as Socket.io to provide seamless, realtime collaboration experiences.</p>
             <p>Please remember that we take student safety very seriously, and if abuse reports are made we always investigate.</p>

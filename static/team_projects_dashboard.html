@@ -51,6 +51,10 @@
             overflow-x: clip;
         }
 
+        .scrollContainer::-webkit-scrollbar {
+            display: none;
+        }
+
         .menuOption {
             width: calc(40vw - 30px);
             color: white;
@@ -109,6 +113,10 @@
             overflow-y: scroll;
         }
 
+        .viewer::-webkit-scrollbar {
+            display: none;
+        }
+
         input {
             border-radius: 5px;
             border-width: 2px;
@@ -157,6 +165,10 @@
             overflow-y: scroll;
             width: 100%;
         }
+
+        .contentViewer::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -171,7 +183,7 @@
     <div class="viewer">
         <div id="contentViewer" class="contentViewer">
             <p><b>Welcome to Team Projects!</b></p>
-            <p>Here you can collaborate with other CLAW users in real time! Please remember to treat everybody with respect and that we have access to project data for investigation purposes if an abuse report is made.</p>
+            <p>Here you can collaborate with other CLAW users in real time! Please remember to treat everybody with respect and kindness.</p>
             <p><i>Create new project:</i></p>
             <input type="text" id="newProjectName" placeholder="Project name">
             <button onclick="">Collaborate now!</button>
