@@ -3,6 +3,8 @@ A platform for students to stay organized and work together
 
 <i>Demo of an old (generally stable) commit: https://claw.kittentech.org</i>
 
+<i>Known issues: [click here](https://github.com/DarkCat736/CLAW/issues/1)</i>
+
 <b>Setup:</b>
 
 1. Install MySQL server (https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
