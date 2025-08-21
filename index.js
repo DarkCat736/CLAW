@@ -29,6 +29,9 @@ let service_config = {
     },
     account: {
         available: true
+    },
+    assignment_tracker: {
+        available: true
     }
 };
 
@@ -65,6 +68,10 @@ app.get('/service/checklist', (req, res) => {
 
 app.get('/service/teamprojects', (req, res) => {
     res.sendFile(join(__dirname, 'static/team_projects_dashboard.html'));
+});
+
+app.get('/service/assignment_tracker', (req, res) => {
+    res.sendFile(join(__dirname, 'static/assignment_tracker.html'));
 });
 
 app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) => {

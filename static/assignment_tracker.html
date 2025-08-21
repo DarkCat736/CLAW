@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome to CLAW</title>
+    <title>CLAW - Assignment Tracker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -79,44 +79,15 @@
 <body>
 <div class="scrollContainer">
     <div id="topBanner" class="topBanner">
-        <h2>Welcome to CLAW!</h2>
+        <h2>CLAW - Assignment Tracker</h2>
         <h2 style="position:absolute;right: 15px;top:0px;" id="loginStatusText"><i>You are logged out.</i></h2>
     </div>
-    <div class="serviceTile" id="account" available_service="false" onclick="window.open('service/account', '_self')">
-        <span class="serviceTile_text">
-            <h2>Account / API Login</h2>
-            <p>Manage your account and connect Canvas.</p>
-        </span>
-    </div>
-    <div class="serviceTile" id="team_projects" available_service="false" onclick="window.open('service/teamprojects', '_self')">
-        <span class="serviceTile_text">
-            <h2>Team Projects</h2>
-            <p>Collaborate on group projects in real time.</p>
-        </span>
-    </div>
-    <div class="serviceTile" id="checklist" available_service="false" onclick="window.open('service/checklist', '_self')">
-        <span class="serviceTile_text">
-            <h2>Checklist</h2>
-            <p>Make a simple todo list with your tasks.</p>
-        </span>
-    </div>
-    <div class="serviceTile" id="solo_projects" available_service="false" onclick="window.open('service/solo_projects', '_self')">
-        <span class="serviceTile_text">
-            <h2>Solo Projects</h2>
-            <p>Keep track of large or complicated assignments.</p>
-        </span>
-    </div>
-    <div class="serviceTile" id="assignment_tracker" available_service="false" onclick="window.open('service/assignment_tracker', '_self')">
-        <span class="serviceTile_text">
-            <h2>Assignment Tracker</h2>
-            <p>Organize all your assignments in an advanced todo list.</p>
-        </span>
-    </div>
+    <p>Assignment Tracker</p>
 </div>
 </body>
 <script src="/api/getclientapi"></script>
 <script>
     CLAW_ClientAPI.init();
-    CLAW_ClientAPI.checkServiceAvailability(["solo_projects", "team_projects", "checklist", "account", "assignment_tracker"], true);
+    CLAW_ClientAPI.service.assignment_tracker.init();
 </script>
 </html>

@@ -59,6 +59,11 @@ let CLAW_ClientAPI = {
                 }
             }
         },
+        assignment_tracker: {
+            init: async function() {
+                await CLAW_ClientAPI.auth.init(true);
+            }
+        },
         checklist: {
             init: async function () {
                 await CLAW_ClientAPI.auth.init(true);
