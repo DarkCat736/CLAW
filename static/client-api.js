@@ -169,27 +169,31 @@ let CLAW_ClientAPI = {
                 await CLAW_ClientAPI.service.checklist.updateChecklistItemsEditMode();
             },
             deleteChecklist: async function() {
-                if (CLAW_ClientAPI.service.checklist.currentChecklistIndex == null) return;
-                let createNewChecklistAtZero;
-                if (Object.keys(CLAW_ClientAPI.service.checklist.data).length == 1) createNewChecklistAtZero = true;
-                let checklistArray = [];
-                for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data).length; i++) {
-                    checklistArray.push(CLAW_ClientAPI.service.checklist.data[i]);
+                if (confirm(`Are you sure you want to delete the checklist "${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title}"? This is an irreversible action.`)) {
+                    if (CLAW_ClientAPI.service.checklist.currentChecklistIndex == null) return;
+                    let createNewChecklistAtZero;
+                    if (Object.keys(CLAW_ClientAPI.service.checklist.data).length == 1) createNewChecklistAtZero = true;
+                    let checklistArray = [];
+                    for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data).length; i++) {
+                        checklistArray.push(CLAW_ClientAPI.service.checklist.data[i]);
+                    }
+                    checklistArray.splice(CLAW_ClientAPI.service.checklist.currentChecklistIndex, 1);
+                    this.data = {};
+                    for (let i = 0; i < checklistArray.length; i++) {
+                        this.data[i] = checklistArray[i];
+                    }
+                    if (createNewChecklistAtZero) {
+                        CLAW_ClientAPI.service.checklist.data[Object.keys(CLAW_ClientAPI.service.checklist.data).length] = {title: "New checklist", content: {0: {content: "Add items now...", completed: "false"}}}
+                    }
+                    let pushSuccess = await this.pushDBData();
+                    await this.updateChecklistsList();
+                    if (CLAW_ClientAPI.service.checklist.currentChecklistIndex + 1 > Object.keys(CLAW_ClientAPI.service.checklist.data).length) {
+                        CLAW_ClientAPI.service.checklist.currentChecklistIndex = Object.keys(CLAW_ClientAPI.service.checklist.data).length - 1;
+                    }
+                    await CLAW_ClientAPI.service.checklist.switchChecklists(CLAW_ClientAPI.service.checklist.currentChecklistIndex);
+                } else {
+                    await CLAW_ClientAPI.service.checklist.switchChecklists(CLAW_ClientAPI.service.checklist.currentChecklistIndex);
                 }
-                checklistArray.splice(CLAW_ClientAPI.service.checklist.currentChecklistIndex, 1);
-                this.data = {};
-                for (let i = 0; i < checklistArray.length; i++) {
-                    this.data[i] = checklistArray[i];
-                }
-                if (createNewChecklistAtZero) {
-                    CLAW_ClientAPI.service.checklist.data[Object.keys(CLAW_ClientAPI.service.checklist.data).length] = {title: "New checklist", content: {0: {content: "Add items now...", completed: "false"}}}
-                }
-                let pushSuccess = await this.pushDBData();
-                await this.updateChecklistsList();
-                if (CLAW_ClientAPI.service.checklist.currentChecklistIndex + 1 > Object.keys(CLAW_ClientAPI.service.checklist.data).length) {
-                    CLAW_ClientAPI.service.checklist.currentChecklistIndex = Object.keys(CLAW_ClientAPI.service.checklist.data).length - 1;
-                }
-                await CLAW_ClientAPI.service.checklist.switchChecklists(CLAW_ClientAPI.service.checklist.currentChecklistIndex);
             },
             updateChecklistItemsEditMode: async function() {
                 document.getElementById("editChecklistButton").innerHTML = "Save Checklist";

@@ -74,6 +74,88 @@
             position: relative;
             padding: 15px;
         }
+
+        .classes_menu {
+            position: relative;
+            background-color: rgba(7, 17, 62, 0.3);
+            width: 95vw;
+            height: 5vh;
+            left: calc(2.5vw - 10px);
+            top: 3vh;
+            text-align: left;
+            backdrop-filter: blur(100px);
+            transition: 0.2s;
+            color: white;
+            overflow-x: scroll;
+            overflow-y: clip;
+            border-radius: 5px;
+            padding-left: 20px;
+            padding-bottom: 10px;
+            white-space: nowrap;
+        }
+
+        .classes_menu::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sort_menu {
+            position: relative;
+            background-color: rgba(7, 17, 62, 0.3);
+            width: 95vw;
+            height: 5vh;
+            left: calc(2.5vw - 10px);
+            top: 3vh;
+            text-align: left;
+            backdrop-filter: blur(100px);
+            transition: 0.2s;
+            color: white;
+            overflow-x: scroll;
+            overflow-y: clip;
+            border-radius: 5px;
+            padding-left: 20px;
+            padding-bottom: 10px;
+            margin-top: 10px;
+            white-space: nowrap;
+        }
+
+        .sort_menu::-webkit-scrollbar {
+            display: none;
+        }
+
+        .menuOption {
+            display: inline-block;
+            color: white;
+            position: relative;
+            top: -1px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-right: 10px;
+            transition: 0.2s;
+            font-family: "Montserrat", sans-serif;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-width: 0;
+
+        }
+
+        .menuOption:hover {
+            cursor: pointer;
+            background-color: rgba(7, 17, 62, 1);
+            box-shadow: 0px 0px 15px 1px rgba(91, 45, 255, 0.9);
+        }
+
+        .menuOption[selected="true"] {
+            background-color: rgba(7, 17, 62, 1);
+        }
+
+        .menuTitle {
+            display: inline-block;
+            color: white;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -82,7 +164,27 @@
         <h2>CLAW - Assignment Tracker</h2>
         <h2 style="position:absolute;right: 15px;top:0px;" id="loginStatusText"><i>You are logged out.</i></h2>
     </div>
-    <p>Assignment Tracker</p>
+    <div id="classes_menu" class="classes_menu">
+        <p class="menuTitle">Class: </p>
+        <button class="menuOption">All</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+        <button class="menuOption">Advanced Geometry</button>
+    </div>
+    <div id="sort_menu" class="sort_menu">
+        <p class="menuTitle">Sort: </p>
+        <button class="menuOption">All</button>
+    </div>
 </div>
 </body>
 <script src="/api/getclientapi"></script>
