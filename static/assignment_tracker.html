@@ -30,33 +30,6 @@
             box-shadow: rgba(0, 0, 0, 0.7) 0px 3px 20px;
         }
 
-        .serviceTile {
-            background-color: rgba(7, 17, 62, 0.3);
-            width: 40vw;
-            height: 140px;
-            border-radius: 10px;
-            margin-left: 4.89vw;
-            margin-right: 4.89vw;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            display: inline-flex;
-            text-align: center;
-            backdrop-filter: blur(100px);
-            transition: 0.2s;
-        }
-
-        .serviceTile:hover {
-            cursor: pointer;
-            background-color: rgba(7, 17, 62, 1);
-            box-shadow: 0px 0px 40px 2px rgba(91, 45, 255, 0.9);
-            transform: scale(102%);
-        }
-
-        .serviceTile[available_service="false"] {
-            display: none;
-        }
-
         .scrollContainer {
             height: 100vh;
             width: 100vw;
@@ -79,7 +52,7 @@
             position: relative;
             background-color: rgba(7, 17, 62, 0.3);
             width: 95vw;
-            height: 5vh;
+            height: 42px;
             left: calc(2.5vw - 10px);
             top: 3vh;
             text-align: left;
@@ -92,17 +65,19 @@
             padding-left: 20px;
             padding-bottom: 10px;
             white-space: nowrap;
+            scrollbar-width: none;
+            scrollbar-color: #371D77FF #5832b5;
         }
 
-        .classes_menu::-webkit-scrollbar {
-            display: none;
+        .classes_menu:hover {
+            scrollbar-width: thin;
         }
 
         .sort_menu {
             position: relative;
             background-color: rgba(7, 17, 62, 0.3);
             width: 95vw;
-            height: 5vh;
+            height: 42px;
             left: calc(2.5vw - 10px);
             top: 3vh;
             text-align: left;
@@ -116,10 +91,12 @@
             padding-bottom: 10px;
             margin-top: 10px;
             white-space: nowrap;
+            scrollbar-width: none;
+            scrollbar-color: #371D77FF #5832b5;
         }
 
-        .sort_menu::-webkit-scrollbar {
-            display: none;
+        .sort_menu:hover {
+            scrollbar-width: thin;
         }
 
         .menuOption {
@@ -132,7 +109,6 @@
             padding-left: 10px;
             padding-right: 10px;
             border-radius: 5px;
-            display: inline-block;
             margin-right: 10px;
             transition: 0.2s;
             font-family: "Montserrat", sans-serif;
