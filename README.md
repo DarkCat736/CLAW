@@ -1,9 +1,9 @@
 # CLAW
-A platform for students to stay organized and work together
+A platform for students to stay organized and work together! Currently CLAW has a fully functional checklist, an assignment tracker in development, and many more features including Team Projects on the way in the future!
 
-<i>Demo of an old (generally stable) commit: https://claw.kittentech.org</i>
+<i>Official host (generally stable): https://claw.kittentech.org</i>
 
-<i>Known issues: [click here](https://github.com/DarkCat736/CLAW/issues/1)</i>
+<i>Known issues: [read here](https://github.com/DarkCat736/CLAW/issues/1)</i>
 
 <b>Setup:</b>
 
@@ -30,7 +30,7 @@ claw (db)
    |_ info (TEXT)
 ```
 
-<i>Client Side API Map</i>
+<i>Client Side API Map (not up-to-date)</i>
 
 ```
 CLAW_ClientAPI (root object)
