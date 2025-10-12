@@ -6,8 +6,10 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const {from} = require("buffer");
 const port = 9876;
-const mysql_rootpassword = "claw_password"; //INSERT PASSWORD! THIS PROTECTS USER DATA SO IT SHOULD BE SECURE!
-const mysql_user = "claw_user"; //THIS MUST BE CHANGED TO ROOT UNLESS YOU CREATE THE "claw_user" ACCOUNT!
+require('dotenv').config();
+
+const mysql_rootpassword = process.env.MYSQL_DB_PASSWORD;
+const mysql_user = process.env.MYSQL_DB_USER;
 
 //server initialization
 const app = express();
@@ -17,23 +19,7 @@ server.listen(port, async () => {
 });
 const io = new Server(server);
 
-let service_config = {
-    checklist: {
-        available: true
-    },
-    solo_projects: {
-        available: true
-    },
-    team_projects: {
-        available: true
-    },
-    account: {
-        available: true
-    },
-    assignment_tracker: {
-        available: true
-    }
-};
+let service_config = JSON.parse(process.env.SERVICE_AVAILABILITY);
 
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'static/dashboard.html'));

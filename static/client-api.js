@@ -62,6 +62,26 @@ let CLAW_ClientAPI = {
         assignment_tracker: {
             init: async function() {
                 await CLAW_ClientAPI.auth.init(true);
+                await this.server_connection.init();
+            },
+            server_connection: {
+                //ts not set up like at all
+                socket: null,
+                init: async function() {
+                    let auth = await CLAW_ClientAPI.auth.init(false);
+                    this.socket = io();
+                    this.socket.emit('init', {serviceForInit: "assignment_tracker", email: `${CLAW_ClientAPI.auth.user.email}`, hashedPassword: `${CLAW_ClientAPI.auth.user.password}`});
+                    this.socket.on('update', (payload) => {
+                        switch (payload.type) {
+                            case "data_return":
+                                this.activeUserList.push(payload.email);
+                                break;
+                            default:
+                                console.log("parsing error for server collaboration communication.");
+                        }
+                        console.log(payload);
+                    });
+                },
             }
         },
         checklist: {
@@ -317,6 +337,7 @@ let CLAW_ClientAPI = {
             let savedAuthInfo;
             try {
                 savedAuthInfo = JSON.parse(localStorage.getItem("auth_data"));
+                console.log(savedAuthInfo);
             } catch (e) {
                 console.log(e);
                 this.loggedIn = false;
@@ -326,23 +347,30 @@ let CLAW_ClientAPI = {
                 return;
             }
 
-            if (savedAuthInfo.email != null && savedAuthInfo.passwordHashed != null && savedAuthInfo.name != null) {
-                console.log(await CLAW_ClientAPI.auth.authorizeCredentials(savedAuthInfo.email, savedAuthInfo.passwordHashed));
-                if (!await CLAW_ClientAPI.auth.authorizeCredentials(savedAuthInfo.email, savedAuthInfo.passwordHashed)) {
+            if (savedAuthInfo != null) {
+                if (savedAuthInfo.email != null && savedAuthInfo.passwordHashed != null && savedAuthInfo.name != null) {
+                    console.log(await CLAW_ClientAPI.auth.authorizeCredentials(savedAuthInfo.email, savedAuthInfo.passwordHashed));
+                    if (!await CLAW_ClientAPI.auth.authorizeCredentials(savedAuthInfo.email, savedAuthInfo.passwordHashed)) {
+                        this.loggedIn = false;
+                        if (changeLoggedInText) {
+                            document.getElementById("loginStatusText").innerHTML = `<i>You are logged out</i>`;
+                        }
+                        alert(`WARNING: You have credentials saved locally that do not match an account in the database. Try logging in again and if the problem persists, contact support.`);
+                        return false;
+                    }
+                    this.user.email = savedAuthInfo.email;
+                    this.user.password = savedAuthInfo.passwordHashed;
+                    this.user.name = savedAuthInfo.name;
+                    this.user.additionalInfo.canvasAPIAvailable = (savedAuthInfo.additionalInfo.canvasAPIAvailable == 'true');
+                    this.loggedIn = true;
+                    if (changeLoggedInText) {
+                        document.getElementById("loginStatusText").innerHTML = `<i>${this.user.name}</i>`;
+                    }
+                } else {
                     this.loggedIn = false;
                     if (changeLoggedInText) {
                         document.getElementById("loginStatusText").innerHTML = `<i>You are logged out</i>`;
                     }
-                    alert(`WARNING: You have credentials saved locally that do not match an account in the database. Try logging in again and if the problem persists, contact support.`);
-                    return false;
-                }
-                this.user.email = savedAuthInfo.email;
-                this.user.password = savedAuthInfo.passwordHashed;
-                this.user.name = savedAuthInfo.name;
-                this.user.canvasAPIAvailable = (savedAuthInfo.additionalInfo.canvasAPIAvailable === 'true');
-                this.loggedIn = true;
-                if (changeLoggedInText) {
-                    document.getElementById("loginStatusText").innerHTML = `<i>${this.user.name}</i>`;
                 }
             } else {
                 this.loggedIn = false;
@@ -356,7 +384,9 @@ let CLAW_ClientAPI = {
             name: null,
             email: null,
             password: null,
-            canvasAPIAvailable: false
+            additionalInfo: {
+                canvasAPIAvailable: false
+            }
         },
         signUp: function(email, password, name) {
             if (this.loggedIn == true) {
@@ -434,8 +464,10 @@ let CLAW_ClientAPI = {
             });
         },
         logOut: function () {
-            localStorage.removeItem("auth_data");
-            location.reload();
+            if (confirm(`Are you sure you want to log out?`)) {
+                localStorage.removeItem("auth_data")
+                location.reload();
+            }
         }
     }
 }
