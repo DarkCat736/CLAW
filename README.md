@@ -25,7 +25,7 @@ A platform for students to stay organized and work together! Currently CLAW has 
 ```dotenv
 MYSQL_DB_USER=claw_user
 MYSQL_DB_PASSWORD=claw_password
-SERVICE_AVAILABILITY={"checklist":{"available":true},"solo_projects":{"available":true},"team_projects":{"available":true},"account":{"available":true},"assignment_tracker":{"available":true}}
+SERVICE_AVAILABILITY={"checklist":{"available":true},"account":{"available":true}}
 ```
 
 <hr>
