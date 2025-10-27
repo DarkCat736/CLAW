@@ -7,6 +7,8 @@ A platform for students to stay organized and work together! Currently CLAW has 
 
 <b>Setup:</b>
 
+[This guide](https://github.com/DarkCat736/CLAW/wiki/CLAW-Setup) has detailed setup instructions. Below is a quick overview.
+
 1. Install MySQL server (https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
 2. Run `CREATE DATABASE claw;USE claw;CREATE TABLE accounts (email text, password text, name text, info text);CREATE TABLE team_projects (id int, name text, data text, authorizedUsers text);SET GLOBAL wait_timeout = 2;` in the MySQL console
 3. Create the "claw_user" account using `CREATE USER 'claw_user'@'localhost' IDENTIFIED BY 'claw_password';GRANT ALL PRIVILEGES ON claw.* TO 'claw_user'@'localhost';FLUSH PRIVILEGES;` <i>NOTE: You should change 'claw_password' to a more secure password. This is just an example.</i>
