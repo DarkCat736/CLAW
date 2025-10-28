@@ -6,6 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="/api/getstyle" rel="stylesheet">
     <style>
         body {
             background-image: linear-gradient(to bottom right, #e63131, #1d35d3);
@@ -16,179 +17,7 @@
             margin: 0px;
         }
 
-        .topBanner {
-            background-color: rgb(55, 29, 119);
-            backdrop-filter: blur(5px);
-            width: calc(100vw - 30px);
-            position: relative;
-            top: 0px;
-            padding-left: 15px;
-            padding-right: 15px;
-            padding-top: 1px;
-            padding-bottom: 1px;
-            color: white;
-            box-shadow: rgba(0, 0, 0, 0.7) 0px 3px 20px;
-        }
 
-        .sidebar {
-            background-color: rgba(7, 17, 62, 0.3);
-            width: 40vw;
-            border-radius: 10px;
-            margin-left: 5vw;
-            margin-right: 5vw;
-            margin-top: 30px;
-            padding-left: 10px;
-            display: inline-flex;
-            text-align: left;
-            backdrop-filter: blur(100px);
-            transition: 0.2s;
-        }
-
-        .scrollContainer {
-            height: 100vh;
-            width: 100vw;
-            overflow-y: scroll;
-            overflow-x: clip;
-        }
-
-        .scrollContainer::-webkit-scrollbar {
-            display: none;
-        }
-
-        .checklistMenuOption {
-            width: calc(40vw - 30px);
-            color: white;
-            position: relative;
-            padding-top: 5px;
-            padding-bottom: 5px;
-            padding-left: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            transition: 0.2s;
-        }
-
-        .checklistMenuOption:hover {
-            cursor: pointer;
-            background-color: rgba(7, 17, 62, 1);
-            box-shadow: 0px 0px 15px 1px rgba(91, 45, 255, 0.9);
-            transform: scale(101%);
-        }
-
-        .checklistMenuOption[selected="true"] {
-            background-color: rgba(7, 17, 62, 1);
-        }
-
-        .viewer {
-            position: relative;
-            background-color: rgba(7, 17, 62, 0.3);
-            width: 40vw;
-            height: calc(100% - 155px);
-            right: 0px;
-            top: 0px;
-            border-radius: 10px;
-            margin-left: 0vw;
-            margin-top: 30px;
-            padding-left: 20px;
-            padding-right: 20px;
-            padding-bottom: 20px;
-            display: inline-flex;
-            flex-direction: column;
-            text-align: left;
-            backdrop-filter: blur(100px);
-            transition: 0.2s;
-            color: white;
-            overflow-y: scroll;
-        }
-
-        .viewer::-webkit-scrollbar {
-            display: none;
-        }
-
-        input {
-            border-radius: 5px;
-            border-width: 2px;
-            width: calc(75% - 15px);
-            border-color: black;
-            border-style: solid;
-            background-color: #1d2f8f;
-            outline: none;
-            color: white;
-            transition: 0.2s;
-            font-family: "Montserrat", sans-serif;
-            padding: 5px;
-            margin-top: 5px;
-        }
-
-        input:focus {
-            border-color: #c33142;
-        }
-
-        button {
-            border-radius: 5px;
-            border-width: 2px;
-            border-color: black;
-            border-style: solid;
-            background-color: #1d2f8f;
-            outline: none;
-            color: white;
-            transition: 0.2s;
-            margin-top: 5px;
-            margin-right: 15px;
-            padding: 5px;
-            font-family: "Montserrat", sans-serif;
-        }
-
-        button:hover {
-            background-color: #2b42c1;
-            cursor: pointer;
-        }
-
-        button:active {
-            background-color: #142fc5;
-        }
-
-        .checkButton {
-            height: 30px;
-            width: 30px;
-            margin-right: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            transform: translate(0px, 23px);
-            transition: 0.2s;
-            filter: contrast(0.7) opacity(0.9) hue-rotate(30deg);
-        }
-        
-        .checkButton:hover {
-            cursor: pointer;
-        }
-
-        .checkButton[checked = "true"] {
-            filter: contrast(1) opacity(1) hue-rotate(0deg);
-        }
-
-        .checkButton[checked = "true"]:hover {
-            cursor: pointer;
-        }
-
-        .checkListItemText {
-            line-height: 28px;
-            transform: translate(0px, -20px);
-            margin-bottom: 0px;
-            margin-top: 0px;
-        }
-
-        .checklistItemTextContainer[checked = "true"] {
-            filter: contrast(0.5) opacity(0.5) hue-rotate(40deg);
-        }
-
-        .checklistItemEditButton {
-            margin: 0px;
-        }
-
-        a {
-            color: white;
-        }
     </style>
 </head>
 <body>
@@ -204,7 +33,7 @@
         <p><b><span id="checklistTitleText">Select a checklist to begin!<br><br>v0.1.0 - Stable BETA<br><br><a href="https://github.com/DarkCat736/CLAW/wiki/CHECKLIST-%E2%80%90-Module-Documentation"><i>Documentation</i></a></span></b></p>
         <div id="checklistViewerContainer">
         </div>
-        <span class="buttonContainer"><button onclick="CLAW_ClientAPI.service.checklist.deleteChecklist()">Delete Checklist</button><button id="editChecklistButton">Edit Checklist</button></span>
+        <span class="buttonContainer"><button class="checklist_button" onclick="CLAW_ClientAPI.service.checklist.deleteChecklist()">Delete Checklist</button><button class="checklist_button" id="editChecklistButton">Edit Checklist</button></span>
     </div>
 </div>
 </body>

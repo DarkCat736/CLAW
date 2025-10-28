@@ -39,6 +39,11 @@ app.get('/api/service/:serviceID/availability', (req, res) => {
 app.get('/api/getclientapi', (req, res) => {
     res.setHeader('content-type', 'text/javascript');
     res.sendFile(join(__dirname, 'static/client-api.js'));
+})
+
+app.get('/api/getstyle', (req, res) => {
+    res.setHeader('content-type', 'text/css');
+    res.sendFile(join(__dirname, 'static/style.css'));
 });
 
 //begin service routing
