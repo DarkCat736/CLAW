@@ -56,31 +56,6 @@ let CLAW_ClientAPI = {
                 }
             }
         },
-        assignment_tracker: {
-            init: async function() {
-                await CLAW_ClientAPI.auth.init(true);
-                await this.server_connection.init();
-            },
-            server_connection: {
-                //ts not set up like at all
-                socket: null,
-                init: async function() {
-                    let auth = await CLAW_ClientAPI.auth.init(false);
-                    this.socket = io();
-                    this.socket.emit('init', {serviceForInit: "assignment_tracker", email: `${CLAW_ClientAPI.auth.user.email}`, hashedPassword: `${CLAW_ClientAPI.auth.user.password}`});
-                    this.socket.on('update', (payload) => {
-                        switch (payload.type) {
-                            case "data_return":
-                                this.activeUserList.push(payload.email);
-                                break;
-                            default:
-                                console.log("parsing error for server collaboration communication.");
-                        }
-                        console.log(payload);
-                    });
-                },
-            }
-        },
         checklist: {
             init: async function () {
                 await CLAW_ClientAPI.auth.init(true);
@@ -302,74 +277,6 @@ let CLAW_ClientAPI = {
             },
             currentChecklistIndex: null,
             data: null
-        },
-        team_projects: {
-            dashboard: {
-                init: async function() {
-                    let auth = await CLAW_ClientAPI.auth.init(true);
-                    await this.updateProjectList();
-                },
-                updateProjectList: async function() {
-                    await CLAW_ClientAPI.service.team_projects.user.getAddedProjects();
-                    document.getElementById("menuOptionsContainer").innerHTML = ``;
-                    document.getElementById("menuOptionsContainer").innerHTML += `<p class="staticMenuOption"><b>Available projects:</b></p>`;
-                    for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.team_projects.user.addedProjects).length; i++) {
-                        document.getElementById("menuOptionsContainer").innerHTML += `<p class="menuOption" id="projectMenuOption_${i}" onclick="" selected="false">${CLAW_ClientAPI.service.team_projects.user.addedProjects[i].name}</p>`;
-                    }
-                    document.getElementById("menuOptionsContainer").innerHTML += `<p class="menuOption" onclick="window.open('/', '_self')"><i>Return to Dashboard</i></p>`;
-                }
-            },
-            user: {
-                getAddedProjects: async function() {
-                    return new Promise((resolve, reject) => {
-                        let httpAPIRequest = new XMLHttpRequest();
-                        httpAPIRequest.responseType = 'json';
-                        httpAPIRequest.open('GET', `/api/service/team_projects/get_added_projects/${CLAW_ClientAPI.auth.user.email}/${encodeURIComponent(CLAW_ClientAPI.auth.user.password)}`);
-                        httpAPIRequest.onload = function (e) {
-                            if (this.status == 200) {
-                                if (this.response["resType"] == "error") {
-                                    alert(`ERROR: ${this.response["error"]}`);
-                                    window.open('/', '_self');
-                                } else {
-                                    CLAW_ClientAPI.service.team_projects.user.addedProjects = JSON.parse(this.response["data"]);
-                                    resolve(true);
-                                }
-                            }
-                        };
-                        httpAPIRequest.send();
-                    });
-                },
-                addedProjects: null
-            },
-            collaboration: {
-                currentProjectID: null,
-                activeUserList: [],
-                joinProject: function(projectID) {
-                    this.socket.emit('init', {serviceForInit: "team_projects", email: `${CLAW_ClientAPI.auth.user.email}`, hashedPassword: `${CLAW_ClientAPI.auth.user.password}`, teamProjectID: projectID});
-                },
-                socket: null,
-                init: async function() {
-                    let auth = await CLAW_ClientAPI.auth.init(false);
-                    this.socket = io();
-                    this.joinProject(0);
-                    this.socket.on('update', (payload) => {
-                        switch (payload.type) {
-                            case "new_user":
-                                console.log(`user with ID "${payload.email}" has joined the project.`);
-                                this.activeUserList.push(payload.email);
-                                break;
-                            default:
-                                console.log("parsing error for server collaboration communication.");
-                        }
-                        console.log(payload);
-                    });
-                },
-            },
-            projects: {
-                getProjectOverview: async function () {
-
-                }
-            }
         }
     },
     auth: {

@@ -1,11 +1,13 @@
-# CLAW BETA
-A platform for students to stay organized and work together!
+# CLAW - <i>v0.1.1</i>
+A platform for students to stay organized and work together! Currently CLAW has a fully functional checklist, an assignment tracker in development, and many more features including Team Projects on the way in the future!
 
-<i>This version of CLAW has no guantees for data safety, and may include various bugs. DO NOT USE IN PRODUCTION SENARIOS.</i>
+<i>Official host: https://claw.kittentech.org</i>
 
 <i>Known issues: [read here](https://github.com/DarkCat736/CLAW/issues/1)</i>
 
 <b>Setup:</b>
+
+[This guide](https://github.com/DarkCat736/CLAW/wiki/CLAW-Setup) has detailed setup instructions. Below is a quick overview.
 
 1. Install MySQL server (https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
 2. Run `CREATE DATABASE claw;USE claw;CREATE TABLE accounts (email text, password text, name text, info text);CREATE TABLE team_projects (id int, name text, data text, authorizedUsers text);SET GLOBAL wait_timeout = 2;` in the MySQL console
@@ -25,7 +27,7 @@ A platform for students to stay organized and work together!
 ```dotenv
 MYSQL_DB_USER=claw_user
 MYSQL_DB_PASSWORD=claw_password
-SERVICE_AVAILABILITY={"checklist":{"available":true},"solo_projects":{"available":true},"team_projects":{"available":true},"account":{"available":true},"assignment_tracker":{"available":true}}
+SERVICE_AVAILABILITY={"checklist":{"available":true},"account":{"available":true}}
 ```
 
 <hr>
