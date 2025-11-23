@@ -7,8 +7,19 @@ const {from} = require("buffer");
 const port = 9876;
 require('dotenv').config();
 
+const assignment_tracker = require('./service_modules/assignment_tracker.js');
+
 const mysql_rootpassword = process.env.MYSQL_DB_PASSWORD;
 const mysql_user = process.env.MYSQL_DB_USER;
+
+const dbPool = mysql.createPool({
+    host: 'localhost',
+    user: mysql_user,
+    password: mysql_rootpassword,
+    database: 'claw',
+    waitForConnections: true,
+    connectionLimit: 20
+});
 
 //server initialization
 const app = express();
@@ -63,18 +74,11 @@ app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) =>
         return;
     }
     try {
-        let db_connection = await mysql.createConnection({
-            host: 'localhost',
-            user: mysql_user,
-            password: mysql_rootpassword,
-            database: 'claw'
-        });
-        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
-        console.log(rows);
+        const [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+
         let userInfoObject = JSON.parse(rows[0]["info"]);
-        db_connection.destroy();
         if (userInfoObject.checklist == null) {
-             userInfoObject.checklist = {
+            userInfoObject.checklist = {
                 "0": {
                     "title": "Untitled checklist",
                     "content": {
@@ -85,14 +89,8 @@ app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) =>
                     }
                 }
             }
-            let db_connection = await mysql.createConnection({
-                host: 'localhost',
-                user: mysql_user,
-                password: mysql_rootpassword,
-                database: 'claw'
-            });
-            let [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
-            db_connection.destroy();
+
+            const [rows, fields] = dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
             res.type("application/json");
             res.send({resType: "success", data: `${JSON.stringify(userInfoObject.checklist)}`});
         } else {
@@ -114,28 +112,14 @@ app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, r
         return;
     }
     try {
-        let db_connection = await mysql.createConnection({
-            host: 'localhost',
-            user: mysql_user,
-            password: mysql_rootpassword,
-            database: 'claw'
-        });
-        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+        let [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
         console.log(rows);
         let userInfoObject = JSON.parse(rows[0]["info"]);
-        db_connection.destroy();
 
         userInfoObject.checklist = JSON.parse(decodeURIComponent(req.params.data));
         console.log(JSON.stringify(userInfoObject).replaceAll('\\', '\\\\'));
 
-        db_connection = await mysql.createConnection({
-            host: 'localhost',
-            user: mysql_user,
-            password: mysql_rootpassword,
-            database: 'claw'
-        });
-        [rows, fields] = await db_connection.execute(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject).replaceAll('\\', '\\\\').replaceAll("'", "\\'")}' WHERE email = '${req.params.email}';`);
-        db_connection.destroy();
+        [rows, fields] = await dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject).replaceAll('\\', '\\\\').replaceAll("'", "\\'")}' WHERE email = '${req.params.email}';`);
         res.type("application/json");
         res.send({resType: "success"});
     } catch (e) {
@@ -148,60 +132,33 @@ app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, r
 //auth tasks
 app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
     try {
-        let db_connection = await mysql.createConnection({
-            host: 'localhost',
-            user: mysql_user,
-            password: mysql_rootpassword,
-            database: 'claw'
-        });
-        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+        let [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
         if (rows[0] != null) {
             res.type("application/json");
             res.send({resType: "error", error: "The email you provided is already connected to an account"});
             return;
         }
 
-        db_connection.destroy();
-
-        db_connection = await mysql.createConnection({
-            host: 'localhost',
-            user: mysql_user,
-            password: mysql_rootpassword,
-            database: 'claw'
-        });
-
         let encryptedPassword;
         await bcrypt.hash(req.params.password, 10).then(function(result) {
             encryptedPassword = result;
         });
 
-        [rows, fields] = await db_connection.execute(`INSERT INTO accounts VALUES ('${req.params.email}', '${encryptedPassword}', '${req.params.name}', '{"active":"true","canvasAPIKey":"null"}');`);
+        [rows, fields] = await dbPool.query(`INSERT INTO accounts VALUES ('${req.params.email}', '${encryptedPassword}', '${req.params.name}', '{"active":"true","canvasAPIKey":"null"}');`);
         if (rows != null) {
             res.type("application/json");
             res.send({resType: "success", encryptedPassword: `${encryptedPassword}`});
         }
-        db_connection.destroy();
     } catch (e) {
         console.error('Error executing query: ', e);
         res.type("application/json");
         res.send({resType: "error", error: "There was an error when processing your request. (internal server error)"});
-        try {
-            db_connection.destroy();
-        } catch (e) {
-            console.log("DB connection close failure. (might be a harmless error): ", e);
-        }
     }
 });
 
 app.get('/api/auth/signin/:email/:password', async (req, res) => {
     try {
-        let db_connection = await mysql.createConnection({
-            host: 'localhost',
-            user: mysql_user,
-            password: mysql_rootpassword,
-            database: 'claw'
-        });
-        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
+        let [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
         if (rows[0] == null) {
             res.type("application/json");
             res.send({resType: "error", error: "There is no account associated with the provided email."});
@@ -240,13 +197,7 @@ app.get('/api/auth/authorize_creds/:email/:encryptedPassword', async (req, res) 
 
 async function signInForService(email, passwordHash) {
     try {
-        let db_connection = await mysql.createConnection({
-            host: 'localhost',
-            user: mysql_user,
-            password: mysql_rootpassword,
-            database: 'claw'
-        });
-        let [rows, fields] = await db_connection.execute(`SELECT * FROM accounts WHERE email = '${email}';`);
+        let [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${email}';`);
 
         return (passwordHash === rows[0].password);
     } catch (e) {
