@@ -7,12 +7,10 @@ const {from} = require("buffer");
 const port = 9876;
 require('dotenv').config();
 
-const assignment_tracker = require('./service_modules/assignment_tracker.js');
-
 const mysql_rootpassword = process.env.MYSQL_DB_PASSWORD;
 const mysql_user = process.env.MYSQL_DB_USER;
 
-const dbPool = mysql.createPool({
+let dbPool = mysql.createPool({
     host: 'localhost',
     user: mysql_user,
     password: mysql_rootpassword,
@@ -21,9 +19,18 @@ const dbPool = mysql.createPool({
     connectionLimit: 20
 });
 
+module.exports = {
+    dbPool
+}
+
+const assignment_tracker = require('./service_modules/assignment_tracker.js');
+const realtime_handler = require('./service_modules/realtime_handler');
+const auth_backend = require('./service_modules/auth_backend');
+
 //server initialization
 const app = express();
 const server = createServer(app);
+realtime_handler.api.init(server);
 server.listen(port, async () => {
     console.log(`CLAW server listening on port ${port}`);
 });
@@ -61,8 +68,12 @@ app.get('/service/checklist', (req, res) => {
     res.sendFile(join(__dirname, 'static/checklist.html'));
 });
 
+app.get('/service/assignment_tracker', (req, res) => {
+    res.sendFile(join(__dirname, 'static/assignment_tracker.html'));
+});
+
 app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) => {
-    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.password));
+    let authorized = await auth_backend.authAPI.signInForService(req.params.email, decodeURIComponent(req.params.password), dbPool);
     if (!authorized) {
         res.type("application/json");
         res.send({resType: "error", error: "Authorization error."});
@@ -85,7 +96,7 @@ app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) =>
                 }
             }
 
-            const [rows, fields] = dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
+            const result = await dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
             res.type("application/json");
             res.send({resType: "success", data: `${JSON.stringify(userInfoObject.checklist)}`});
         } else {
@@ -100,7 +111,7 @@ app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) =>
 });
 
 app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, res) => {
-    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.password));
+    let authorized = await auth_backend.authAPI.signInForService(req.params.email, decodeURIComponent(req.params.password), dbPool);
     if (!authorized) {
         res.type("application/json");
         res.send({resType: "error", error: "Authorization error."});
@@ -180,7 +191,7 @@ app.get('/api/auth/signin/:email/:password', async (req, res) => {
 });
 
 app.get('/api/auth/authorize_creds/:email/:encryptedPassword', async (req, res) => {
-    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.encryptedPassword));
+    let authorized = await auth_backend.authAPI.signInForService(req.params.email, decodeURIComponent(req.params.encryptedPassword), dbPool);
     if (!authorized) {
         res.type("application/json");
         res.send({result: "false"});
@@ -189,14 +200,3 @@ app.get('/api/auth/authorize_creds/:email/:encryptedPassword', async (req, res) 
         res.send({result: "true"});
     }
 });
-
-async function signInForService(email, passwordHash) {
-    try {
-        let [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${email}';`);
-
-        return (passwordHash === rows[0].password);
-    } catch (e) {
-        console.log(e);
-        return false;
-    }
-}

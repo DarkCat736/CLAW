@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CLAW - Assignment Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: linear-gradient(to bottom right, #e63131, #1d35d3);
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            font-family: "Montserrat", sans-serif;
+            margin: 0px;
+        }
+
+        .topBanner {
+            background-color: rgb(55, 29, 119);
+            backdrop-filter: blur(5px);
+            width: calc(100vw - 30px);
+            position: relative;
+            top: 0px;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+            color: white;
+            box-shadow: rgba(0, 0, 0, 0.7) 0px 3px 20px;
+        }
+
+        .scrollContainer {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            overflow-x: clip;
+        }
+
+        .scrollContainer::-webkit-scrollbar {
+            display: none;
+        }
+
+        .serviceTile_text {
+            width: 100%;
+            color: white;
+            position: relative;
+            padding: 15px;
+        }
+
+        .classes_menu {
+            position: relative;
+            background-color: rgba(7, 17, 62, 0.3);
+            width: 95vw;
+            height: 42px;
+            left: calc(2.5vw - 10px);
+            top: 3vh;
+            text-align: left;
+            backdrop-filter: blur(100px);
+            transition: 0.2s;
+            color: white;
+            overflow-x: scroll;
+            overflow-y: clip;
+            border-radius: 5px;
+            padding-left: 20px;
+            padding-bottom: 10px;
+            white-space: nowrap;
+            scrollbar-width: none;
+            scrollbar-color: #371D77FF #5832b5;
+        }
+
+        .classes_menu:hover {
+            scrollbar-width: thin;
+        }
+
+        .sort_menu {
+            position: relative;
+            background-color: rgba(7, 17, 62, 0.3);
+            width: 95vw;
+            height: 42px;
+            left: calc(2.5vw - 10px);
+            top: 3vh;
+            text-align: left;
+            backdrop-filter: blur(100px);
+            transition: 0.2s;
+            color: white;
+            overflow-x: scroll;
+            overflow-y: clip;
+            border-radius: 5px;
+            padding-left: 20px;
+            padding-bottom: 10px;
+            margin-top: 10px;
+            white-space: nowrap;
+            scrollbar-width: none;
+            scrollbar-color: #371D77FF #5832b5;
+        }
+
+        .sort_menu:hover {
+            scrollbar-width: thin;
+        }
+
+        .menuOption {
+            display: inline-block;
+            color: white;
+            position: relative;
+            top: -1px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: 0.2s;
+            font-family: "Montserrat", sans-serif;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-width: 0;
+
+        }
+
+        .menuOption:hover {
+            cursor: pointer;
+            background-color: rgba(7, 17, 62, 1);
+            box-shadow: 0px 0px 15px 1px rgba(91, 45, 255, 0.9);
+        }
+
+        .menuOption[selected="true"] {
+            background-color: rgba(7, 17, 62, 1);
+        }
+
+        .menuTitle {
+            display: inline-block;
+            color: white;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="scrollContainer">
+    <div id="topBanner" class="topBanner">
+        <h2>CLAW - Assignment Tracker</h2>
+        <h2 style="position:absolute;right: 15px;top:0px;" id="loginStatusText"><i>You are logged out.</i></h2>
+    </div>
+    <div id="classes_menu" class="classes_menu">
+        <p class="menuTitle">Class: </p><button class="menuOption">All</button>
+    </div>
+    <div id="sort_menu" class="sort_menu">
+        <p class="menuTitle" style="margin-right:17px;">Sort: </p>
+        <button class="menuOption">All</button>
+    </div>
+</div>
+</body>
+<script src="/api/getclientapi"></script>
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+<script>
+    const socket = io();
+    CLAW_ClientAPI.init();
+    CLAW_ClientAPI.service.assignment_tracker.init();
+</script>
+</html>
