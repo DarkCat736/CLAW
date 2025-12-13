@@ -1,7 +1,7 @@
-# CLAW - <i>v0.1.1</i>
+# CLAW - <i>v0.2.0 (BETA VERSION)</i>
 A platform for students to stay organized and work together! Currently CLAW has a fully functional checklist, an assignment tracker in development, and many more features including Team Projects on the way in the future!
 
-<i>Official host: https://claw.kittentech.org</i>
+<i>Official host: Beta host coming soon...</i>
 
 <i>Known issues: [read here](https://github.com/DarkCat736/CLAW/issues/1)</i>
 
@@ -22,7 +22,7 @@ A platform for students to stay organized and work together! Currently CLAW has 
 1. Create a file called `.env` in the root CLAW directory
 2. Three fields are required - MYSQL_DB_USER, MYSQL_DB_PASSWORD, and SERVICE_AVAILABILITY
 3. The two MySQL fields are strings, but the Service Availability field is a stringified JSON!
-4. Here is an example of a fully completed `.env`:
+4. Here is an example of a fully completed `.env` with only PROD features enabled:
 
 ```dotenv
 MYSQL_DB_USER=claw_user
