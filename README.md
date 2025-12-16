@@ -3,9 +3,13 @@ A platform for students to stay organized and work together! Currently CLAW has 
 
 <i>Official host: https://claw.kittentech.org</i>
 
+<i>If the official host is inaccessible please wait at least 20 minutes before making a bug report. The server automatically restarts after 15 minutes of network failures which generally fixes most connection issues.</i>
+
 <i>Known issues: [read here](https://github.com/DarkCat736/CLAW/issues/1)</i>
 
 <b>Setup:</b>
+
+[This guide](https://github.com/DarkCat736/CLAW/wiki/CLAW-Setup) has detailed setup instructions. Below is a quick overview.
 
 1. Install MySQL server (https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
 2. Run `CREATE DATABASE claw;USE claw;CREATE TABLE accounts (email text, password text, name text, info text);CREATE TABLE team_projects (id int, name text, data text, authorizedUsers text);SET GLOBAL wait_timeout = 2;` in the MySQL console
