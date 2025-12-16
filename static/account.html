@@ -49,7 +49,7 @@
             <p><b>Canvas API Integration</b></p>
             <p><i>Current status: </i><span id="canvasAPIStatusText">NO API KEY IN DATABASE</span></p>
             <p><i><span id="canvasAPIKeyInputHeader">Add / Replace Canvas API key:</span></i></p>
-            <input type="password" id="canvasAPIKeyInput" placeholder="API Key">
+            <input class="account_textbox" type="password" id="canvasAPIKeyInput" placeholder="API Key">
             <button onclick="" id="canvasAPISubmitButton">Submit to database</button>
         </div>
         <div id="clawaccount_loginoption_view" style="display: none;">
@@ -60,13 +60,13 @@
             </span>
             <span id="clawAccountLoggedOutChunk">
                 <p><i>Sign in:</i></p>
-                <input type="email" id="clawAccountSignInEmail" placeholder="Email">
-                <input type="password" id="clawAccountSignInPassword" placeholder="Password">
+                <input class="account_textbox" type="email" id="clawAccountSignInEmail" placeholder="Email">
+                <input class="account_textbox" type="password" id="clawAccountSignInPassword" placeholder="Password">
                 <button onclick="CLAW_ClientAPI.auth.signIn(document.getElementById('clawAccountSignInEmail').value, document.getElementById('clawAccountSignInPassword').value)" id="clawAccountSignInButton">Sign in</button>
                 <p><i>Sign up:</i></p>
-                <input type="email" id="clawAccountSignUpEmail" placeholder="Email">
-                <input type="password" id="clawAccountSignUpPassword" placeholder="Password">
-                <input type="text" id="clawAccountSignUpName" placeholder="Full Name">
+                <input class="account_textbox" type="email" id="clawAccountSignUpEmail" placeholder="Email">
+                <input class="account_textbox" type="password" id="clawAccountSignUpPassword" placeholder="Password">
+                <input class="account_textbox" type="text" id="clawAccountSignUpName" placeholder="Full Name">
                 <button onclick="CLAW_ClientAPI.auth.signUp(document.getElementById('clawAccountSignUpEmail').value, document.getElementById('clawAccountSignUpPassword').value, document.getElementById('clawAccountSignUpName').value)" id="clawAccountSignUpButton">Sign up</button>
             </span>
         </div>
