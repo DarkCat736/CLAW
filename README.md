@@ -3,6 +3,8 @@ A platform for students to stay organized and work together! Currently CLAW has 
 
 <i>Official host: Beta host coming soon...</i>
 
+<i>If the official host is inaccessible please wait at least 20 minutes before making a bug report. The server automatically restarts after 15 minutes of network failures which generally fixes most connection issues.</i>
+
 <i>Known issues: [read here](https://github.com/DarkCat736/CLAW/issues/1)</i>
 
 <b>Setup:</b>
