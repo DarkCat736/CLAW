@@ -7,8 +7,6 @@ const {from} = require("buffer");
 const port = 9876;
 require('dotenv').config();
 
-const assignment_tracker = require('./service_modules/assignment_tracker.js');
-
 const mysql_rootpassword = process.env.MYSQL_DB_PASSWORD;
 const mysql_user = process.env.MYSQL_DB_USER;
 
