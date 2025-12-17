@@ -1,7 +1,7 @@
-# CLAW - <i>v0.1.1</i>
+# CLAW - <i>v0.2.0 (BETA VERSION)</i>
 A platform for students to stay organized and work together! Currently CLAW has a fully functional checklist, an assignment tracker in development, and many more features including Team Projects on the way in the future!
 
-<i>Official host: https://claw.kittentech.org</i>
+<i>Official host: Beta host coming soon...</i>
 
 <i>If the official host is inaccessible please wait at least 20 minutes before making a bug report. The server automatically restarts after 15 minutes of network failures which generally fixes most connection issues.</i>
 
@@ -12,7 +12,7 @@ A platform for students to stay organized and work together! Currently CLAW has 
 [This guide](https://github.com/DarkCat736/CLAW/wiki/CLAW-Setup) has detailed setup instructions. Below is a quick overview.
 
 1. Install MySQL server (https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
-2. Run `CREATE DATABASE claw;USE claw;CREATE TABLE accounts (email text, password text, name text, info text);CREATE TABLE team_projects (id int, name text, data text, authorizedUsers text);SET GLOBAL wait_timeout = 2;` in the MySQL console
+2. Run `CREATE DATABASE claw;USE claw;CREATE TABLE accounts (email text, password text, name text, info text);CREATE TABLE team_projects (id int, name text, data text, authorizedUsers text);CREATE TABLE assignment_tracker (id INT AUTO_INCREMENT PRIMARY KEY, owner text, permittedUsers text, data text);SET GLOBAL wait_timeout = 2;` in the MySQL console
 3. Create the "claw_user" account using `CREATE USER 'claw_user'@'localhost' IDENTIFIED BY 'claw_password';GRANT ALL PRIVILEGES ON claw.* TO 'claw_user'@'localhost';FLUSH PRIVILEGES;` <i>NOTE: You should change 'claw_password' to a more secure password. This is just an example.</i>
 4. Download the repository and run `npm install`
 5. Follow the instructions below to create a `.env` file  
@@ -24,7 +24,7 @@ A platform for students to stay organized and work together! Currently CLAW has 
 1. Create a file called `.env` in the root CLAW directory
 2. Three fields are required - MYSQL_DB_USER, MYSQL_DB_PASSWORD, and SERVICE_AVAILABILITY
 3. The two MySQL fields are strings, but the Service Availability field is a stringified JSON!
-4. Here is an example of a fully completed `.env`:
+4. Here is an example of a fully completed `.env` with only PROD features enabled:
 
 ```dotenv
 MYSQL_DB_USER=claw_user
