@@ -9,12 +9,14 @@ require('dotenv').config();
 
 const mysql_rootpassword = process.env.MYSQL_DB_PASSWORD;
 const mysql_user = process.env.MYSQL_DB_USER;
+const mysql_host = process.env.MYSQL_DB_HOST;
+const mysql_dbname = process.env.MYSQL_DB_NAME;
 
 let dbPool = mysql.createPool({
-    host: 'localhost',
+    host: mysql_host,
     user: mysql_user,
     password: mysql_rootpassword,
-    database: 'claw',
+    database: mysql_dbname,
     waitForConnections: true,
     connectionLimit: 20
 });
