@@ -3,7 +3,7 @@ A platform for students to stay organized and work together! Currently CLAW has 
 
 <b><i>UPDATE NOTICE!!!</i></b> The MYSQL_DB_HOST and MYSQL_DB_NAME fields are now required in the .env file for the BETA version of CLAW. Check the BETA setup instructions for more details.
 
-<i>Official host: Beta host coming soon...</i>
+<i>Official BETA host: [YOUR DATA IS NOT GUANTEED AT THIS SITE! Use at your own risk.](https://beta.claw.kittentech.org)</i>
 
 <i>If the official host is inaccessible please wait at least 20 minutes before making a bug report. The server automatically restarts after 15 minutes of network failures which generally fixes most connection issues.</i>
 
