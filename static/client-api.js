@@ -59,50 +59,63 @@ let CLAW_ClientAPI = {
         checklist: {
             init: async function () {
                 await CLAW_ClientAPI.auth.init(true);
-                await this.pullDBData(this.updateChecklistsList);
+                //register with server
+                await socket.timeout(2000).emit('checklist', {payload: "INIT", email: CLAW_ClientAPI.auth.user.email, password: CLAW_ClientAPI.auth.user.password}, async (err, response) => {
+                    if (err) {
+                        this.fatalError("Init error");
+                    } else {
+                        if (response.status === "error") {
+                            this.fatalError(response.code);
+                        } else {
+                            await this.pullDBData(this.updateChecklistsList);
+                            socket.on("checklist", (payload, callback) => {
+                                let callbackMsg = this.messageDirector(payload, socket);
+                                callback(callbackMsg);
+                            });
+                            console.log("Checklist init success");
+                        }
+                    }
+                });
             },
             pullDBData: function(callback) {
-                return new Promise((resolve, reject) => {
-                    let httpAPIRequest = new XMLHttpRequest();
-                    httpAPIRequest.responseType = 'json';
-                    httpAPIRequest.open('GET', `/api/service/checklist/pull_data/${CLAW_ClientAPI.auth.user.email}/${encodeURIComponent(CLAW_ClientAPI.auth.user.password)}`);
-                    httpAPIRequest.onload = function (e) {
-                        if (this.status == 200) {
-                            if (this.response["resType"] == "error") {
-                                alert(`ERROR: ${this.response["error"]}`);
-                                window.open('/', '_self');
+                return new Promise(resolve => {
+                    socket.timeout(10000).emit('checklist', {payload: "PULL_DB_DATA"}, (err, response) => {
+                        if (err) {
+                            this.fatalError("Pull db data error");
+                            resolve(false);
+                        } else {
+                            if (response.status === "error") {
+                                this.fatalError(response.code);
+                                resolve(false);
                             } else {
-                                CLAW_ClientAPI.service.checklist.data = JSON.parse(this.response["data"]);
+                                CLAW_ClientAPI.service.checklist.data = response.payload;
+                                console.log(CLAW_ClientAPI.service.checklist.data);
                                 if (callback != null) {
                                     callback();
                                 }
+                                console.log("Checklist pull db data success");
                                 resolve(true);
                             }
                         }
-                    };
-                    httpAPIRequest.send();
+                    });
                 });
             },
             pushDBData: function(callback) {
-                return new Promise((resolve, reject) => {
-                    let httpAPIRequest = new XMLHttpRequest();
-                    httpAPIRequest.responseType = 'json';
-                    httpAPIRequest.open('GET', `/api/service/checklist/push_data/${CLAW_ClientAPI.auth.user.email}/${encodeURIComponent(CLAW_ClientAPI.auth.user.password)}/${encodeURIComponent(JSON.stringify(this.data))}`);
-                    httpAPIRequest.onload = function (e) {
-                        if (this.status == 200) {
-                            if (this.response["resType"] == "error") {
-                                alert(`ERROR: ${this.response["error"]}`);
-                                window.open('/', '_self');
+                return new Promise(resolve => {
+                    socket.timeout(5000).emit('checklist', {payload: "PUSH_DB_DATA", data: CLAW_ClientAPI.service.checklist.data}, (err, response) => {
+                        if (err) {
+                            this.fatalError("Push db data error");
+                            resolve(false);
+                        } else {
+                            if (response.status === "error") {
+                                this.fatalError(response.code);
+                                resolve(false);
                             } else {
-                                console.log("data pushed.");
+                                console.log("Checklist push db data success");
                                 resolve(true);
-                                if (callback != null) {
-                                    callback();
-                                }
                             }
                         }
-                    };
-                    httpAPIRequest.send();
+                    });
                 });
             },
             updateChecklistsList: async function() {
@@ -110,13 +123,13 @@ let CLAW_ClientAPI = {
                 document.getElementById("menuOptionsContainer").innerHTML = "";
                 for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data).length; i++) {
                     console.log(`Checklist found: "${CLAW_ClientAPI.service.checklist.data[i].title}"`);
-                    document.getElementById("menuOptionsContainer").innerHTML += `<p class="checklistMenuOption" id="checklistOption_${i}" onclick="CLAW_ClientAPI.service.checklist.switchChecklists(${i})" selected="false">${CLAW_ClientAPI.service.checklist.data[i].title}</p>`;
+                    document.getElementById("menuOptionsContainer").innerHTML += `<p class="checklistMenuOption" id="checklistOption_${i}" onclick="CLAW_ClientAPI.service.checklist.switchChecklists(${i})" selected="false">${atob(CLAW_ClientAPI.service.checklist.data[i].title)}</p>`;
                 }
                 document.getElementById("menuOptionsContainer").innerHTML += `<p class="checklistMenuOption" onclick="CLAW_ClientAPI.service.checklist.createNewChecklist()"><i>Add new checklist...</i></p>`;
                 document.getElementById("menuOptionsContainer").innerHTML += `<p class="checklistMenuOption" onclick="window.open('/', '_self')"><i>Return to Dashboard</i></p>`;
             },
             createNewChecklist: async function() {
-                CLAW_ClientAPI.service.checklist.data[Object.keys(CLAW_ClientAPI.service.checklist.data).length] = {title: "New checklist", content: {0: {content: "Add items now...", completed: "false"}}};
+                CLAW_ClientAPI.service.checklist.data[Object.keys(CLAW_ClientAPI.service.checklist.data).length] = {title: `${btoa("New checklist")}`, content: {0: {content: `${btoa("Add items now...")}`, completed: "false"}}};
                 let pushSuccess = await this.pushDBData();
                 this.updateChecklistsList();
                 this.switchChecklists(Object.keys(CLAW_ClientAPI.service.checklist.data).length - 1);
@@ -129,7 +142,7 @@ let CLAW_ClientAPI = {
                     document.getElementById("checklistViewerContainer").innerHTML = "";
                     for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[checklistIndex].content).length; i++) {
                         console.log(`Checklist item found: "${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].content}"`);
-                        document.getElementById("checklistViewerContainer").innerHTML += `<span class="checklistItemContainer"><p class="checkListItemText" id="checkboxContainer_${i}" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}"><img id="checkboxButton_${i}" onclick="CLAW_ClientAPI.service.checklist.checkboxToggleFrom(${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}, ${i})" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}" class="checkButton" src="/static/graphics/check_icon.png"><span class="checklistItemTextContainer" id="checkboxText_${i}" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}">${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].content}</span></p></span>`;
+                        document.getElementById("checklistViewerContainer").innerHTML += `<span class="checklistItemContainer"><p class="checkListItemText" id="checkboxContainer_${i}" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}"><img id="checkboxButton_${i}" onclick="CLAW_ClientAPI.service.checklist.checkboxToggleFrom(${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}, ${i})" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}" class="checkButton" src="/static/graphics/check_icon.png"><span class="checklistItemTextContainer" id="checkboxText_${i}" checked="${CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].completed}">${atob(CLAW_ClientAPI.service.checklist.data[checklistIndex].content[i].content)}</span></p></span>`;
                     }
                     resolve(true);
                 });
@@ -137,10 +150,10 @@ let CLAW_ClientAPI = {
             addChecklistItem: async function() {
                 document.getElementById("addNewItemButton").disabled = true;
                 for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length; i++) {
-                    CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content = `${document.getElementById(`checklistItemEditBox_${i}`).value}`;
+                    CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content = `${btoa(document.getElementById(`checklistItemEditBox_${i}`).value)}`;
                 }
-                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title = `${document.getElementById("checklistTitleEditBox").value}`;
-                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length] = {content: "New item", completed: "false"};
+                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title = `${btoa(document.getElementById("checklistTitleEditBox").value)}`;
+                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length] = {content: `${btoa("New item")}`, completed: `${btoa("false")}`};
                 let pushSuccess = await this.pushDBData();
                 await CLAW_ClientAPI.service.checklist.updateChecklistItemsEditMode();
             },
@@ -216,7 +229,7 @@ let CLAW_ClientAPI = {
                 await CLAW_ClientAPI.service.checklist.updateChecklistItemsEditMode();
             },
             deleteChecklist: async function() {
-                if (confirm(`Are you sure you want to delete the checklist "${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title}"? This is an irreversible action.`)) {
+                if (confirm(`Are you sure you want to delete the checklist "${atob(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title)}"? This is an irreversible action.`)) {
                     if (CLAW_ClientAPI.service.checklist.currentChecklistIndex == null) return;
                     let createNewChecklistAtZero;
                     if (Object.keys(CLAW_ClientAPI.service.checklist.data).length == 1) createNewChecklistAtZero = true;
@@ -230,7 +243,7 @@ let CLAW_ClientAPI = {
                         this.data[i] = checklistArray[i];
                     }
                     if (createNewChecklistAtZero) {
-                        CLAW_ClientAPI.service.checklist.data[Object.keys(CLAW_ClientAPI.service.checklist.data).length] = {title: "New checklist", content: {0: {content: "Add items now...", completed: "false"}}}
+                        CLAW_ClientAPI.service.checklist.data[Object.keys(CLAW_ClientAPI.service.checklist.data).length] = {title: `${btoa("New checklist")}`, content: {0: {content: `${btoa("Add items now...")}`, completed: "false"}}}
                     }
                     let pushSuccess = await this.pushDBData();
                     await this.updateChecklistsList();
@@ -246,18 +259,19 @@ let CLAW_ClientAPI = {
                 document.getElementById("editChecklistButton").innerHTML = "Save Checklist";
                 document.getElementById("editChecklistButton").onclick = CLAW_ClientAPI.service.checklist.saveFromEditMode;
                 document.getElementById("checklistViewerContainer").innerHTML = "";
-                document.getElementById("checklistTitleText").innerHTML = `<input type="text" id="checklistTitleEditBox" value='${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title.replaceAll('"', '\\"')}'><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.addChecklistItem()" id="addNewItemButton">+</button>`;
+                document.getElementById("checklistTitleText").innerHTML = `<input type="text" id="checklistTitleEditBox" value='${atob(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title)}'><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.addChecklistItem()" id="addNewItemButton">+</button>`;
                 for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length; i++) {
                     console.log(`Checklist item found: "${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}"`);
-                    document.getElementById("checklistViewerContainer").innerHTML += `<span><input type="text" style="background-color: ${JSON.parse(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].completed) ? "#1d8755" : "#8f2430"}" id="checklistItemEditBox_${i}" value='${CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content}'><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.moveChecklistItemUp(${i})">&uarr;</button><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.moveChecklistItemDown(${i})">&darr;</button><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.deleteChecklistItem(${i})">x</button></span>`;
+                    document.getElementById("checklistViewerContainer").innerHTML += `<span><input type="text" style="background-color: ${JSON.parse(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].completed) ? "#1d8755" : "#8f2430"}" id="checklistItemEditBox_${i}" value=""><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.moveChecklistItemUp(${i})">&uarr;</button><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.moveChecklistItemDown(${i})">&darr;</button><button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.deleteChecklistItem(${i})">x</button></span>`;
+                    document.getElementById(`checklistItemEditBox_${i}`).value = atob(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content);
                 }
             },
             saveFromEditMode: async function() {
                 for (let i = 0; i < Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length; i++) {
-                    CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content = `${document.getElementById(`checklistItemEditBox_${i}`).value}`;
+                    CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content = `${btoa(document.getElementById(`checklistItemEditBox_${i}`).value)}`;
                 }
-                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title = `${document.getElementById("checklistTitleEditBox").value}`;
-                document.getElementById("checklistTitleText").innerHTML = CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title;
+                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title = `${btoa(document.getElementById("checklistTitleEditBox").value)}`;
+                document.getElementById("checklistTitleText").innerHTML = atob(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title);
                 let pushSuccess = await CLAW_ClientAPI.service.checklist.pushDBData();
                 CLAW_ClientAPI.service.checklist.updateChecklistsList();
                 CLAW_ClientAPI.service.checklist.switchChecklists(CLAW_ClientAPI.service.checklist.currentChecklistIndex);
@@ -266,7 +280,7 @@ let CLAW_ClientAPI = {
                 if (CLAW_ClientAPI.service.checklist.currentChecklistIndex == null) CLAW_ClientAPI.service.checklist.currentChecklistIndex = Object.keys(CLAW_ClientAPI.service.checklist.data).length - 1;
                 document.getElementById(`checklistOption_${this.currentChecklistIndex}`).setAttribute('selected', 'false');
                 document.getElementById(`checklistOption_${newIndex}`).setAttribute('selected', 'true');
-                document.getElementById("checklistTitleText").innerHTML = CLAW_ClientAPI.service.checklist.data[newIndex].title;
+                document.getElementById("checklistTitleText").innerHTML = atob(CLAW_ClientAPI.service.checklist.data[newIndex].title);
                 this.currentChecklistIndex = newIndex;
                 await CLAW_ClientAPI.service.checklist.pullDBData();
                 await CLAW_ClientAPI.service.checklist.updateChecklistItems(newIndex);
@@ -288,7 +302,17 @@ let CLAW_ClientAPI = {
                 let pushSuccess = await this.pushDBData();
             },
             currentChecklistIndex: null,
-            data: null
+            data: null,
+            fatalError: function(e) {
+                alert(`This service has run into an unrecoverable error: ${e}\nPlease try starting the service again and make a GitHub issue if the problem persists.`);
+                //window.open('/', '_self');
+            },
+            messageDirector: async function(payload, socket) {
+                switch (payload.payload) {
+                    default:
+                        console.log("Failure to parse server message");
+                }
+            }
         },
         assignment_tracker: {
             init: async function() {
