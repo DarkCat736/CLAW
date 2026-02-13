@@ -1,7 +1,9 @@
-# CLAW - <i>v0.2.0 (BETA VERSION)</i>
+# CLAW - <i>v0.2.1 (BETA VERSION)</i>
 A platform for students to stay organized and work together! Currently CLAW has a fully functional checklist, an assignment tracker in development, and many more features including Team Projects on the way in the future!
 
 <b><i>UPDATE NOTICE!!!</i></b> The MYSQL_DB_HOST and MYSQL_DB_NAME fields are now required in the .env file for the BETA version of CLAW. Check the BETA setup instructions for more details.
+
+<b><i>UPDATE NOTICE!!!</i></b> The `info` column on the `accounts` table has been changed to be a `JSON` column. This needs to be updated for data to be properly exchanged.  Check the BETA setup instructions for more details. In addition to this, all data stored for the checklist service is now unreadable by the program. All user inputted data needs to be formatted in Base64. You can either restart checklists and enter data again or manually go through and translate the user inputted fields in the JSON to Base64.
 
 <i>Official BETA host: [YOUR DATA IS NOT GUANTEED AT THIS SITE! Use at your own risk.](https://beta.claw.kittentech.org)</i>
 
