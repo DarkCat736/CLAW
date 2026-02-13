@@ -543,7 +543,7 @@ let CLAW_ClientAPI = {
                             passwordHashed: this.response["encryptedPassword"],
                             name: this.response["name"],
                             additionalInfo: {
-                                canvasAPIAvailable: (JSON.parse(this.response["info"]).canvasAPIKey !== "null")
+                                canvasAPIAvailable: (this.response["info"].canvasAPIKey !== "null")
                             }
                         }));
 
