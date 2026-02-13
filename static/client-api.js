@@ -153,7 +153,7 @@ let CLAW_ClientAPI = {
                     CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[i].content = `${btoa(document.getElementById(`checklistItemEditBox_${i}`).value)}`;
                 }
                 CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].title = `${btoa(document.getElementById("checklistTitleEditBox").value)}`;
-                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length] = {content: `${btoa("New item")}`, completed: `${btoa("false")}`};
+                CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content[Object.keys(CLAW_ClientAPI.service.checklist.data[CLAW_ClientAPI.service.checklist.currentChecklistIndex].content).length] = {content: `${btoa("New item")}`, completed: "false"};
                 let pushSuccess = await this.pushDBData();
                 await CLAW_ClientAPI.service.checklist.updateChecklistItemsEditMode();
             },
