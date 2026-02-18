@@ -292,9 +292,11 @@ let CLAW_ClientAPI = {
                 document.getElementById("checklistViewerContainer").innerHTML = "";
 
                 document.getElementById("checklistTitleText").innerHTML = `
-                    <input type="text" id="checklistTitleEditBox" value='${atob(currentChecklist.title)}'>
+                    <input type="text" id="checklistTitleEditBox">
                     <button class="checklistItemEditButton" onclick="CLAW_ClientAPI.service.checklist.addChecklistItem()" id="addNewItemButton">+</button>
                 `;
+
+                document.getElementById("checklistTitleEditBox").value = atob(currentChecklist.title);
 
                 for (let i = 0; i < Object.keys(currentChecklist.content).length; i++) {
                     console.log(i);
