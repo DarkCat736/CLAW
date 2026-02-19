@@ -9,19 +9,29 @@ require('dotenv').config();
 
 const mysql_rootpassword = process.env.MYSQL_DB_PASSWORD;
 const mysql_user = process.env.MYSQL_DB_USER;
+const mysql_host = process.env.MYSQL_DB_HOST;
+const mysql_dbname = process.env.MYSQL_DB_NAME;
 
-const dbPool = mysql.createPool({
-    host: 'localhost',
+let dbPool = mysql.createPool({
+    host: mysql_host,
     user: mysql_user,
     password: mysql_rootpassword,
-    database: 'claw',
+    database: mysql_dbname,
     waitForConnections: true,
     connectionLimit: 20
 });
 
+module.exports = {
+    dbPool
+}
+
+const realtime_handler = require('./service_modules/realtime_handler');
+const auth_backend = require('./service_modules/auth_backend');
+
 //server initialization
 const app = express();
 const server = createServer(app);
+realtime_handler.api.init(server);
 server.listen(port, async () => {
     console.log(`CLAW server listening on port ${port}`);
 });
@@ -64,69 +74,6 @@ app.get('/service/checklist', (req, res) => {
     res.sendFile(join(__dirname, 'static/checklist.html'));
 });
 
-app.get('/api/service/checklist/pull_data/:email/:password', async (req, res) => {
-    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.password));
-    if (!authorized) {
-        res.type("application/json");
-        res.send({resType: "error", error: "Authorization error."});
-        return;
-    }
-    try {
-        const [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
-
-        let userInfoObject = JSON.parse(rows[0]["info"]);
-        if (userInfoObject.checklist == null) {
-            userInfoObject.checklist = {
-                "0": {
-                    "title": "Untitled checklist",
-                    "content": {
-                        "0": {
-                            "content": "Add items now!",
-                            "completed": "false"
-                        }
-                    }
-                }
-            }
-
-            const [rows, fields] = dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject)}' WHERE email = '${req.params.email}';`);
-            res.type("application/json");
-            res.send({resType: "success", data: `${JSON.stringify(userInfoObject.checklist)}`});
-        } else {
-            res.type("application/json");
-            res.send({resType: "success", data: `${JSON.stringify(userInfoObject.checklist)}`});
-        }
-    } catch (e) {
-        res.type("application/json");
-        res.send({resType: "error", error: "Internal server error while getting data."});
-        console.log(e);
-    }
-});
-
-app.get('/api/service/checklist/push_data/:email/:password/:data', async (req, res) => {
-    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.password));
-    if (!authorized) {
-        res.type("application/json");
-        res.send({resType: "error", error: "Authorization error."});
-        return;
-    }
-    try {
-        let [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${req.params.email}';`);
-        console.log(rows);
-        let userInfoObject = JSON.parse(rows[0]["info"]);
-
-        userInfoObject.checklist = JSON.parse(decodeURIComponent(req.params.data));
-        console.log(JSON.stringify(userInfoObject).replaceAll('\\', '\\\\'));
-
-        [rows, fields] = await dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(userInfoObject).replaceAll('\\', '\\\\').replaceAll("'", "\\'")}' WHERE email = '${req.params.email}';`);
-        res.type("application/json");
-        res.send({resType: "success"});
-    } catch (e) {
-        res.type("application/json");
-        res.send({resType: "error", error: "Internal server error while pushing data."});
-        console.log(e);
-    }
-});
-
 //auth tasks
 app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
     try {
@@ -142,7 +89,7 @@ app.get('/api/auth/signup/:email/:password/:name', async (req, res) => {
             encryptedPassword = result;
         });
 
-        [rows, fields] = await dbPool.query(`INSERT INTO accounts VALUES ('${req.params.email}', '${encryptedPassword}', '${req.params.name}', '{"active":"true","canvasAPIKey":"null"}');`);
+        [rows, fields] = await dbPool.query(`INSERT INTO accounts VALUES ('${req.params.email}', '${encryptedPassword}', '${req.params.name}', '{"active":"true","canvasAPIKey":null}');`);
         if (rows != null) {
             res.type("application/json");
             res.send({resType: "success", encryptedPassword: `${encryptedPassword}`});
@@ -183,7 +130,7 @@ app.get('/api/auth/signin/:email/:password', async (req, res) => {
 });
 
 app.get('/api/auth/authorize_creds/:email/:encryptedPassword', async (req, res) => {
-    let authorized = await signInForService(req.params.email, decodeURIComponent(req.params.encryptedPassword));
+    let authorized = await auth_backend.authAPI.signInForService(req.params.email, decodeURIComponent(req.params.encryptedPassword), dbPool);
     if (!authorized) {
         res.type("application/json");
         res.send({result: "false"});
@@ -192,14 +139,3 @@ app.get('/api/auth/authorize_creds/:email/:encryptedPassword', async (req, res) 
         res.send({result: "true"});
     }
 });
-
-async function signInForService(email, passwordHash) {
-    try {
-        let [rows, fields] = await dbPool.query(`SELECT * FROM accounts WHERE email = '${email}';`);
-
-        return (passwordHash === rows[0].password);
-    } catch (e) {
-        console.log(e);
-        return false;
-    }
-}

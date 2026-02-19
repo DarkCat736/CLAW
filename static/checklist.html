@@ -30,7 +30,7 @@
         <span class="menuOptionsContainer" id="menuOptionsContainer"></span>
     </div>
     <div class="viewer">
-        <p><b><span id="checklistTitleText">Select a checklist to begin!<br><br>v0.1.2 - Stable<br><br><a href="https://github.com/DarkCat736/CLAW/wiki/CHECKLIST-%E2%80%90-Service"><i>Documentation</i></a></span></b></p>
+        <p><b><span id="checklistTitleText">Select a checklist to begin!<br><br>v0.2.0 - Stable<br><br><a href="https://github.com/DarkCat736/CLAW/wiki/CHECKLIST-%E2%80%90-Service"><i>Documentation</i></a></span></b></p>
         <div id="checklistViewerContainer">
         </div>
         <span class="buttonContainer"><button class="checklist_button" onclick="CLAW_ClientAPI.service.checklist.deleteChecklist()">Delete Checklist</button><button class="checklist_button" id="editChecklistButton">Edit Checklist</button></span>
@@ -38,7 +38,10 @@
 </div>
 </body>
 <script src="/api/getclientapi"></script>
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <script>
+    const socket = io();
+    CLAW_ClientAPI.init();
     CLAW_ClientAPI.service.checklist.init();
 </script>
 </html>
