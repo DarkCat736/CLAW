@@ -30,28 +30,10 @@
             <p>Manage your account and connect Canvas.</p>
         </span>
     </div>
-    <div class="serviceTile" id="team_projects" available_service="false" onclick="window.open('service/teamprojects', '_self')">
-        <span class="serviceTile_text">
-            <h2>Team Projects</h2>
-            <p>Collaborate on group projects in real time.</p>
-        </span>
-    </div>
     <div class="serviceTile" id="checklist" available_service="false" onclick="window.open('service/checklist', '_self')">
         <span class="serviceTile_text">
             <h2>Checklist</h2>
             <p>Make a simple todo list with your tasks.</p>
-        </span>
-    </div>
-    <div class="serviceTile" id="solo_projects" available_service="false" onclick="window.open('service/solo_projects', '_self')">
-        <span class="serviceTile_text">
-            <h2>Solo Projects</h2>
-            <p>Keep track of large or complicated assignments.</p>
-        </span>
-    </div>
-    <div class="serviceTile" id="assignment_tracker" available_service="false" onclick="window.open('service/assignment_tracker', '_self')">
-        <span class="serviceTile_text">
-            <h2>Assignment Tracker</h2>
-            <p>Organize all your assignments in an advanced todo list.</p>
         </span>
     </div>
 </div>
@@ -59,6 +41,6 @@
 <script src="/api/getclientapi"></script>
 <script>
     CLAW_ClientAPI.init();
-    CLAW_ClientAPI.checkServiceAvailability(["solo_projects", "team_projects", "checklist", "account", "assignment_tracker"], true);
+    CLAW_ClientAPI.checkServiceAvailability(["checklist", "account"], true);
 </script>
 </html>
