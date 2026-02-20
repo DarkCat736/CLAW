@@ -25,7 +25,6 @@ module.exports = {
     dbPool
 }
 
-const assignment_tracker = require('./service_modules/assignment_tracker.js');
 const realtime_handler = require('./service_modules/realtime_handler');
 const auth_backend = require('./service_modules/auth_backend');
 
@@ -73,10 +72,6 @@ app.get('/service/account', (req, res) => {
 
 app.get('/service/checklist', (req, res) => {
     res.sendFile(join(__dirname, 'static/checklist.html'));
-});
-
-app.get('/service/assignment_tracker', (req, res) => {
-    res.sendFile(join(__dirname, 'static/assignment_tracker.html'));
 });
 
 //auth tasks

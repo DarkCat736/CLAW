@@ -26,7 +26,7 @@ async function main() {
             let convertedChecklistData = await convertToBase64(rows[i].info.checklist);
             try {
                 rows[i].info.checklist = convertedChecklistData;
-                [r, f] = await dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(rows[i].info)}' WHERE email = '${rows[i].email}';`);
+                let [r, f] = await dbPool.query(`UPDATE accounts SET info = '${JSON.stringify(rows[i].info)}' WHERE email = '${rows[i].email}';`);
             } catch (e) {
                 console.log(e);
             }
@@ -61,8 +61,10 @@ async function convertToBase64(checklistData) {
 
     for (let checklistIndex = 0; checklistIndex < Object.keys(checklistData).length; checklistIndex++) {
         editedChecklistData[checklistIndex].title = btoa(editedChecklistData[checklistIndex].title);
+        console.log(editedChecklistData[checklistIndex].title);
         for (let itemIndex = 0; itemIndex < Object.keys(checklistData[checklistIndex].content).length; itemIndex++) {
             editedChecklistData[checklistIndex].content[itemIndex].content = btoa(editedChecklistData[checklistIndex].content[itemIndex].content);
+            console.log(editedChecklistData[checklistIndex].content[itemIndex].content);
         }
     }
 
