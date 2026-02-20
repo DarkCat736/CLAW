@@ -25,7 +25,7 @@ A platform for students to stay organized and work together! Currently, CLAW has
 
 1. Create a file called `.env` in the root CLAW directory
 2. Five fields are required - MYSQL_DB_USER, MYSQL_DB_PASSWORD, MYSQL_DB_HOST, MYSQL_DB_NAME, and SERVICE_AVAILABILITY
-3. The two MySQL fields are strings, but the Service Availability field is a stringified JSON!
+3. The four MySQL fields are strings, but the Service Availability field is a stringified JSON!
 4. Here is an example of a fully completed `.env`:
 
 ```dotenv
