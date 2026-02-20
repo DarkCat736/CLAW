@@ -1,9 +1,7 @@
 # CLAW - <i>v0.2.1</i>
 A platform for students to stay organized and work together! Currently, CLAW has a fully functional checklist, an assignment tracker in development, and many more features including Team Projects on the way in the future!
 
-<b><i>UPDATE NOTICE!!!</i></b> The MYSQL_DB_HOST and MYSQL_DB_NAME fields are now required in the .env file for the PROD version of CLAW. Check the PROD setup instructions for more details.
-
-<b><i>UPDATE NOTICE!!!</i></b> The `info` column on the `accounts` table has been changed to be a `JSON` column. This needs to be updated for data to be properly exchanged.  Check the PROD setup instructions for more details. In addition to this, all data stored for the checklist service is now unreadable by the program. All user inputted data needs to be formatted in Base64. You can either restart checklists and enter data again, use [this](https://github.com/DarkCat736/CLAW/wiki/CLAW-Utility-Scripts#update_checklist_user_data_to_base64js) helper script, or manually go through and translate the user inputted fields in the JSON to Base64.
+<b><i>UPDATE NOTICE!!!</i></b> Follow the instructions [here](https://github.com/DarkCat736/CLAW/wiki/CLAW-Update-Warnings#updating-from-v011-to-v021) to update from v0.1.1 to v0.2.1. If you do not follow these instructions before updating, your CLAW installation will break.
 
 <i>Official host: https://claw.kittentech.org</i>
 
