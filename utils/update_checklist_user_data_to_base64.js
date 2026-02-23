@@ -22,7 +22,6 @@ async function main() {
     let [rows, fields] = await dbPool.query(`SELECT * FROM accounts;`);
 
     for (let i = 0; i < rows.length; i++) {
-        console.log(rows.length);
         if (rows[i].info.checklist !== undefined) {
             let convertedChecklistData = await convertToBase64(rows[i].info.checklist);
             try {
